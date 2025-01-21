@@ -1,5 +1,47 @@
 [
   {
+    "objectID": "conferences/index.html",
+    "href": "conferences/index.html",
+    "title": "Conferencias y presentaciones",
+    "section": "",
+    "text": "“Necesidades o lujos: inversión educativa de los hogares en México”.\n\nConferencia presentada en el Congreso Nacional de Ciencias Sociales: las Ciencias Sociales y los retos para la democracia mexicana, el 8 de abril de 2024.\nPresentación disponible aquí.\n\n“Democracia y educación en Latinoamérica”.\n\nPonencia presentada en el Congreso Latinoamericano de Estudiantes de Posgrados en Ciencias Sociales (CLEPSO), el 28 de agosto de 2024.\n\n“La educación como un lujo en México”.\n\nPonencia presentada en el Congreso Latinoamericano de Estudiantes de Posgrados en Ciencias Sociales (CLEPSO), el 29 de agosto de 2024."
+  },
+  {
+    "objectID": "conferences/index.html#recientes",
+    "href": "conferences/index.html#recientes",
+    "title": "Conferencias y presentaciones",
+    "section": "",
+    "text": "“Necesidades o lujos: inversión educativa de los hogares en México”.\n\nConferencia presentada en el Congreso Nacional de Ciencias Sociales: las Ciencias Sociales y los retos para la democracia mexicana, el 8 de abril de 2024.\nPresentación disponible aquí.\n\n“Democracia y educación en Latinoamérica”.\n\nPonencia presentada en el Congreso Latinoamericano de Estudiantes de Posgrados en Ciencias Sociales (CLEPSO), el 28 de agosto de 2024.\n\n“La educación como un lujo en México”.\n\nPonencia presentada en el Congreso Latinoamericano de Estudiantes de Posgrados en Ciencias Sociales (CLEPSO), el 29 de agosto de 2024."
+  },
+  {
+    "objectID": "conferences/index.html#previo-a-2024",
+    "href": "conferences/index.html#previo-a-2024",
+    "title": "Conferencias y presentaciones",
+    "section": "Previo a 2024",
+    "text": "Previo a 2024\n\n“Desigualdad y preferencias hacia la educación: un estudio entre países de la OCDE”.\n\nPonencia presentada en el Seminario de Investigación del Doctorado en Ciencias Sociales, Flacso México, el 22 de septiembre de 2023.\nPresentación disponible aquí.\nWorking Paper disponible aquí.\n\n“Estabilidad mediante cambios en las políticas: inversión en la política de extensión a la jornada escolar en México”.\n\nPonencia presentada en el Congreso Latinoamericano de Estudiantes de Posgrados en Ciencias Sociales (CLEPSO), el 25 de agosto de 2022.\nPresentación disponible aquí.\n\n“Políticas Públicas y Sustentabilidad”.\n\nPonencia presentada en la Jornada de Administración y Políticas Públicas, de la Universidad Autónoma de Morelos, el 3 de junio de 2021.\nPresentación disponible aquí.\n\n“La reforma político-administrativa a la PCM: agenda, problemas, e institucionalismo”.\n\nPonencia presentada en el Primer Coloquio de Estudiantes en Políticas Públicas, organizado por la Universidad Autónoma Metropolitana, el 25 de octubre de 2019.\nPresentación disponible aquí."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Pedro I. Rosas-Medina",
+    "section": "",
+    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
+  },
+  {
+    "objectID": "index.html#bio",
+    "href": "index.html#bio",
+    "title": "Pedro I. Rosas-Medina",
+    "section": "",
+    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
     "objectID": "research/index.html",
     "href": "research/index.html",
     "title": "Proyectos de investigación",
@@ -19,26 +61,5 @@
     "title": "Proyectos de investigación",
     "section": "Gasto educativo de los hogares mexicanos",
     "text": "Gasto educativo de los hogares mexicanos\nAcudir a la escuela implica costos, aún y cuando los servicios adquiridos corresponden al sistema educativo público. Sin considerar a las instituciones de enseñanza privada, que son -probablemente- la categoría singular más relevante del gasto educativo por hogar, la adquisición de libros de texto y apoyo, papelería, e incluso el propio transporte hacia los centros escolares, son algunos de los gastos no siempre cubiertos por el sistema público, y que deben ser provistos de forma privada.\nDiferentes investigaciones han mostrado que los hogares, generalmente invierten siguiendo patrones de ingreso y consumo, características sociodemográficas de estos; y necesidades de atención en función del número de miembros que componen la familia, o aquellos que se encuentran en edad de estudiar. Sin embargo, pocos son los estudios que han explorado estas dinámicas en Latinoamérica y México.\nEn este proyecto busco entender la sensibilidad del gasto educativo de los hogares mexicanos, frente a diversas condiciones sociales y económicas. El primer producto de este proyecto, midió la elasticidad del ingreso en la demanda educativa de los hogares mexicanos, utilizando datos de la Encuesta Nacional de Ingresos y Gastos de los Hogares de México (ENIGH, 2020). Con base en los resultados encontrados, actualmente he concentrado mi atención sobre posibles sesgos de género en la distribución del gasto educativo privado.\nPublicaciones & trabajo en progreso\n\nRosas-Medina, P. I. (2024). Entre necesidades y lujos: el gasto educativo de los hogares en México. Revista Mexicana de Investigación Educativa, 29(102), 631-655. Data y archivos para replicar disponibles aquí. Versión libre disponible.\nRosas-Medina, P.I. (2024). Gender bias in Mexican Households’ educational expenditures: Does the schooling level actually matters? Working paper, under review."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Pedro I. Rosas-Medina",
-    "section": "",
-    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
-  },
-  {
-    "objectID": "index.html#bio",
-    "href": "index.html#bio",
-    "title": "Pedro I. Rosas-Medina",
-    "section": "",
-    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
   }
 ]

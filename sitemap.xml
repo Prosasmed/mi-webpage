@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://Prosasmed.github.io/mi-webpage/research/index.html</loc>
-    <lastmod>2025-01-21T19:00:14.112Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Prosasmed.github.io/mi-webpage/about.html</loc>
-    <lastmod>2025-01-21T19:00:14.108Z</lastmod>
+    <loc>https://Prosasmed.github.io/mi-webpage/conferences/index.html</loc>
+    <lastmod>2025-01-21T19:06:42.474Z</lastmod>
   </url>
   <url>
     <loc>https://Prosasmed.github.io/mi-webpage/index.html</loc>
-    <lastmod>2025-01-21T19:00:14.110Z</lastmod>
+    <lastmod>2025-01-21T19:06:42.495Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Prosasmed.github.io/mi-webpage/about.html</loc>
+    <lastmod>2025-01-21T19:06:42.465Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Prosasmed.github.io/mi-webpage/research/index.html</loc>
+    <lastmod>2025-01-21T19:06:42.497Z</lastmod>
   </url>
 </urlset>
