@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pedro I. Rosas-Medina">
+<meta name="dcterms.date" content="2025-01-16">
+<meta name="description" content="Introducción a la visualización de modelos econométricos en R a través de ggplot2">
+
+<title>Trabajo visual en modelos econométricos – Pedro I. Rosas-Medina</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6e57cf81484042d8f0d77590772c3e27.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Trabajo visual en modelos econométricos – Pedro I. Rosas-Medina">
+<meta property="og:description" content="Introducción a la visualización de modelos econométricos en R a través de ggplot2">
+<meta property="og:image" content="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/banner.png">
+<meta property="og:site_name" content="Pedro I. Rosas-Medina">
+<meta property="og:locale" content="es_MX">
+<meta property="og:image:height" content="1088">
+<meta property="og:image:width" content="1950">
+<meta name="twitter:title" content="Trabajo visual en modelos econométricos – Pedro I. Rosas-Medina">
+<meta name="twitter:description" content="Introducción a la visualización de modelos econométricos en R a través de ggplot2">
+<meta name="twitter:image" content="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/banner.png">
+<meta name="twitter:creator" content="@Pedro0909">
+<meta name="twitter:image-height" content="1088">
+<meta name="twitter:image-width" content="1950">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Pedro I. Rosas-Medina</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research"> 
+<span class="menu-text">Investigación</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../conferences"> 
+<span class="menu-text">Conferencias</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Trabajo visual en modelos econométricos</h1>
+                  <div>
+        <div class="description">
+          Introducción a la visualización de modelos econométricos en R a través de ggplot2
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">ggplot2</div>
+                <div class="quarto-category">tidyverse</div>
+                <div class="quarto-category">Econometrics</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="true">Pedro I. Rosas-Medina</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 16, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#mirando-dentro-de-modelos-econométricos" id="toc-mirando-dentro-de-modelos-econométricos" class="nav-link active" data-scroll-target="#mirando-dentro-de-modelos-econométricos">Mirando dentro de modelos econométricos</a>
+  <ul class="collapse">
+  <li><a href="#gráficos-de-correlación" id="toc-gráficos-de-correlación" class="nav-link" data-scroll-target="#gráficos-de-correlación">Gráficos de correlación</a></li>
+  </ul></li>
+  <li><a href="#modelos-de-regresión-lineal" id="toc-modelos-de-regresión-lineal" class="nav-link" data-scroll-target="#modelos-de-regresión-lineal">Modelos de regresión lineal</a>
+  <ul class="collapse">
+  <li><a href="#tres-recomendaciones-básicas" id="toc-tres-recomendaciones-básicas" class="nav-link" data-scroll-target="#tres-recomendaciones-básicas">Tres recomendaciones básicas</a></li>
+  <li><a href="#pronósticos" id="toc-pronósticos" class="nav-link" data-scroll-target="#pronósticos">Pronósticos</a></li>
+  <li><a href="#estimaciones-a-nivel-componente" id="toc-estimaciones-a-nivel-componente" class="nav-link" data-scroll-target="#estimaciones-a-nivel-componente">Estimaciones a nivel componente</a></li>
+  </ul></li>
+  <li><a href="#efectos-marginales" id="toc-efectos-marginales" class="nav-link" data-scroll-target="#efectos-marginales">Efectos marginales</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>La visualización de datos no únicamente es generar figuras que desplieguen números brutos de un tabulado, o marco de datos. La visualización implica resumir o transformar partes de estos conjuntos de información, y luego graficar los resultados. Los modelos econométricos forman una parte central de este proceso.</p>
+<p>Por ejemplo, a partir de una misma relación entre el PIB per cápita, y la expectativa de vida, podemos contar con diferentes modelos cuyos resultados, nos llevarían a gráficos diferentes. En este gráfico, contamos con líneas de ajuste para una regresión robusta, <em>splines</em> cúbicos, y una regresión cuantílica suavizada.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/bestfit-regressions1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="mirando-dentro-de-modelos-econométricos" class="level2">
+<h2 class="anchored" data-anchor-id="mirando-dentro-de-modelos-econométricos">Mirando dentro de modelos econométricos</h2>
+<p>Un modelo econométrico describe la relación entre una o más variables explicativas, y una o más variables de respuesta. La visualización a través de gráficos puede ayudar a entender estas relaciones. Sin embargo, cubrir los detalles de ajustar modelos econométricos a través de <code>R</code> se encuentra por fuera de los objetivos de este <em>blog</em>. Aquí, en cambio, se discutirán algunas formas de extraer información valiosa, que es fácil de trabajarse a través de <code>ggplot2</code>. El objetivo, por tanto, es tomar objetos almacenados en nuestro entorno, y producir un gráfico apropiado.</p>
+<section id="gráficos-de-correlación" class="level3">
+<h3 class="anchored" data-anchor-id="gráficos-de-correlación">Gráficos de correlación</h3>
+<p>Un gráfico de correlación ayuda a visualizar la relación pareada entre un conjunto de variables cuantitativas, desplegando su fuerza de asociación a través de colores, o sombras.</p>
+<p>El siguiente ejemplo se construye con base en datos de [Gapminder], que se enfoca en estadísticas e información sobre desarrollo social, económico y medioambiental, tanto a nivel local, nacional, como global. Esta base de datos, particularmente, cuenta con información de todos los continentes a nivel mundial, entre 1952 y 2007.</p>
+<p>En el siguiente código:</p>
+<ol type="1">
+<li>La función <code>select_if</code> nos permitirá seleccionar solo las variables cuantitativas dentro de la base de datos.</li>
+<li>La función <code>cor</code> calcula las correlaciones.</li>
+</ol>
+<ul>
+<li>El uso de <code>use = "complete.obs"</code>, elimina todos los casos con valores perdidos.</li>
+</ul>
+<ol start="3" type="1">
+<li>La función <code>round</code> redondeará los resultados obtenidos a dos decimales.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> gapminder<span class="sc">::</span>gapminder</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos variables numericas</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select_if</span>(data, is.numeric)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculamos correlaciones</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">cor</span>(df, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(r, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          year lifeExp   pop gdpPercap
+year      1.00    0.44  0.08      0.23
+lifeExp   0.44    1.00  0.06      0.58
+pop       0.08    0.06  1.00     -0.03
+gdpPercap 0.23    0.58 -0.03      1.00</code></pre>
+</div>
+</div>
+<p>Ahora, para visualizar las correlaciones, la función <code>ggcorrplot()</code> de la paquetería <code>ggcorrplot</code> será utlizada. Por <em>default</em>, la función crea una gráfica de <code>ggplot</code>, donde el rojo más oscuro indicará correlaciones fuertes positivas, el azul más oscuro indicará correlaciones negativas fuertes, y el color blanco indicará no correlación:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcorrplot</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/correlation-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La función <code>ggcorrplot()</code> cuenta con múltiples opciones de personalización. Sin embargo, más allá de repasar cada una de estas, es importante tener en mente que, un gráfico que muestre una matriz de correlación, debe contar por lo menos:</p>
+<ol type="1">
+<li><strong>Diseño visual claro</strong>:</li>
+</ol>
+<ul>
+<li>Colores informativos y graduales que representen magnitud y dirección de la correlación.</li>
+<li>Escala de color comprensible que incluya una barra de escala para mostrar cómo los colores corresponden a los valores del coeficiente de correlación.</li>
+</ul>
+<ol start="2" type="1">
+<li><strong>Presentación de datos relevantes</strong>:</li>
+</ol>
+<ul>
+<li>Hacer visibles los valores de correlación directamente en las celdas.</li>
+<li>Ordenar las variables de forma que se resalten patrones claros.</li>
+<li>Asegurar que el tamaño de las celdas sea adecuado para que los colores, y valores numéricos sean fáciles de interpretar.</li>
+</ul>
+<ol start="3" type="1">
+<li><strong>Foco en información importante</strong>:</li>
+</ol>
+<ul>
+<li>Filtrar correlaciones no significativas (por ejemplo, a través de <code>ggcorrplot(..., insig = "blank")</code>).</li>
+<li>Enfocar variables clave resaltando o agrupando aquellas más importnates para evitar sobrecargar el gráfico.</li>
+</ul>
+<ol start="4" type="1">
+<li><strong>Contexto y anotaciones</strong>:</li>
+</ol>
+<ul>
+<li>Incluir un título descriptivo, asegurándonos que los nombres de las variables sean comprensibles.</li>
+<li>Preferentemente, indicar niveles de significancia.</li>
+</ul>
+<ol start="5" type="1">
+<li><strong>Simplicidad y accesibilidad</strong>:</li>
+</ol>
+<ul>
+<li>Evitar saturación visual.</li>
+<li>Asegurar que el esquema de colores sea apto para personas con alguna discapacidad visual, utilizando paletas como <code>viridis</code>.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcorrplot</span>(r,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">hc.order =</span> <span class="cn">TRUE</span>,        <span class="co"># Reordenamiento segun corr. similar</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">type =</span> <span class="st">"lower"</span>,         <span class="co"># Triangulo inferior de la matriz</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">lab =</span> <span class="cn">TRUE</span>,             <span class="co"># Mostrar valores numericos</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">lab_size =</span> <span class="dv">3</span>,           <span class="co"># Tamaño de los valores</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"firebrick2"</span>, <span class="st">"white"</span>, <span class="st">"dodgerblue"</span>),  <span class="co"># Paleta de colores</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">title =</span> <span class="st">"Matriz de correlación: SaratogaHouses"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">ggtheme =</span> jtools<span class="sc">::</span><span class="fu">theme_apa</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/correlation-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="modelos-de-regresión-lineal" class="level2">
+<h2 class="anchored" data-anchor-id="modelos-de-regresión-lineal">Modelos de regresión lineal</h2>
+<p>Los modelos de regresión lineal permiten explorar la relación entre una variable de respuesta cuantitativa, y una variable explicativa, mientras otras medidas permanecen constantes.</p>
+<p>En este ejemplo, utilizamos una regresión lineal múltiple por Mínimos Cuadrados Ordinarios (MCO), utilizando la base de datos <code>gapminder</code>. Debido a que esta base tiene una estructura tipo panel (país-año), la especificación empleada vuelve la estimación incorrecta. Sin embargo, por ahora no nos fijaremos en este punto.</p>
+<p>Para la estimación, utilizamos la función <code>lm()</code>, cuyo resultado se guardará en un objeto de nombre <code>out</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Construimos el modelo de regresion lineal multiple</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">lm</span>(lifeExp <span class="sc">~</span> gdpPercap <span class="sc">+</span> pop <span class="sc">+</span> continent,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> data)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizamos un resumen de resultados</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = lifeExp ~ gdpPercap + pop + continent, data = data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-49.161  -4.486   0.297   5.110  25.175 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       4.781e+01  3.395e-01 140.819  &lt; 2e-16 ***
+gdpPercap         4.495e-04  2.346e-05  19.158  &lt; 2e-16 ***
+pop               6.570e-09  1.975e-09   3.326 0.000901 ***
+continentAmericas 1.348e+01  6.000e-01  22.458  &lt; 2e-16 ***
+continentAsia     8.193e+00  5.712e-01  14.342  &lt; 2e-16 ***
+continentEurope   1.747e+01  6.246e-01  27.973  &lt; 2e-16 ***
+continentOceania  1.808e+01  1.782e+00  10.146  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 8.365 on 1697 degrees of freedom
+Multiple R-squared:  0.5821,    Adjusted R-squared:  0.5806 
+F-statistic: 393.9 on 6 and 1697 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>El resultado observado con la función <code>summary()</code> nos da una idea precisa del modelo, aunque no podemos hacer mucho más análisis directo. Por ejemplo, ¿qué pasaría si quisiéramos visualizar algo desde este modelo? La información necesaria para generar un gráfico se encuentra dentro del objeto, aunque esta no es obvia a simple vista.</p>
+<section id="tres-recomendaciones-básicas" class="level3">
+<h3 class="anchored" data-anchor-id="tres-recomendaciones-básicas">Tres recomendaciones básicas</h3>
+<p>Toda figura que se construye con base en modelos econométricos se enfrentan a retos de visualización. En ciencias sociales, la habilidad de crear y presentar con honestidad gráficos basados en modelos, ha avanzado significativamente en los últimos años. Sin embargo, al tiempo en que se ha progresado en formas de visualización, también han crecido los retos inherentes a estas tareas debido a la complejidad de los modelos econométricos.</p>
+<ol type="1">
+<li><strong>Presentar los hallazgos en términos sustantivos</strong> Todo gráfico basado en modelos econométricos debe mostrar resultados en formas que son sustancialmente significativos, y directamente interpretables con respecto a las preguntas que el análisis intenta resolver. Por tanto, también es recomendable…</li>
+<li><strong>Presentar los grados de confianza en los gráficos</strong> Los modelos vienen con diversas medidas de precisión, confianza, o significancia. Presentar e interpretar estas medidas puede llevar a malas interpretaciones, e incluso sobre-representaciones. Sin embargo, es necesario ser honestos y claros en lo presentado.</li>
+<li>** Mostrar los datos… siempre que se pueda** Por lo general, presentar resultados de un modelo de regresión lineal múltiple (como en este ejemplo práctico), generalmente significa dos cosas:</li>
+</ol>
+<ul>
+<li>Mostrar el efecto en una tabla con coeficientes asociados a medidas de confianza.</li>
+<li>Mostrar los valores pronosticados de algunas variables dentro de un rango de interés.
+<ul>
+<li>Esto nos permite mostrar datos originales en puntos.</li>
+</ul></li>
+</ul>
+</section>
+<section id="pronósticos" class="level3">
+<h3 class="anchored" data-anchor-id="pronósticos">Pronósticos</h3>
+<p>Ajustado el modelo ahora podemos darnos una idea visual de las estimaciones que produce sobre un rango de variables particulares, manteniendo constantes otros covariantes, en algunos valores sensibles. Para esto seguiremos la función: <code>predict()</code>. ¿Pero qué haremos?</p>
+<p>Primero, generaremos una nueva base de datos cuyas columnas tendrán los mismos nombres que las variables en los datos del modelo original, pero ahora sus filas tendrán nuevos valores. Para esto utilizaremos la función <code>expand.grid()</code>. Sin embargo, antes de ello, utilizaremos las funciones <code>min()</code> y <code>max()</code> para obtener los valores mínimos y máximos de <code>gdpPercap</code>, y luego generaremos un vector con 100 elementos entre estos valores. Finalmente, mantendremos la población constante a su mediana, y dejaremos que la variable <code>continent</code> tome sus cinco valores originales posibles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>min_gdp <span class="ot">&lt;-</span> <span class="fu">min</span>(data<span class="sc">$</span>gdpPercap)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>max_gdp <span class="ot">&lt;-</span> <span class="fu">max</span>(data<span class="sc">$</span>gdpPercap)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>med_pop <span class="ot">&lt;-</span> <span class="fu">median</span>(data<span class="sc">$</span>pop)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>pred_df <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">gdpPercap =</span> (<span class="fu">seq</span>(<span class="at">from =</span> min_gdp, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">to =</span> max_gdp,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">length.out =</span> <span class="dv">100</span>)), </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">pop =</span> med_pop, </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">continent =</span> <span class="fu">c</span>(<span class="st">"Africa"</span>,<span class="st">"Americas"</span>, <span class="st">"Asia"</span>, <span class="st">"Europe"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">"Oceania"</span>))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(pred_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 500   3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pred_out <span class="ot">&lt;-</span> <span class="fu">predict</span>(<span class="at">object =</span> out, <span class="at">newdata =</span> pred_df, <span class="at">interval =</span> <span class="st">"predict"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pred_out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       fit      lwr      upr
+1 47.96863 31.54775 64.38951
+2 48.48298 32.06231 64.90365
+3 48.99733 32.57670 65.41797
+4 49.51169 33.09092 65.93245
+5 50.02604 33.60497 66.44711
+6 50.54039 34.11885 66.96193</code></pre>
+</div>
+</div>
+<p>Como sabemos que, por construcción, los casos en <code>pred_df</code>, y <code>pred_out</code> corresponden a filas por filas, podemos juntar las dos bases de datos por columna.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pred_df <span class="ot">&lt;-</span> <span class="fu">cbind</span>(pred_df, pred_out)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pred_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  gdpPercap     pop continent      fit      lwr      upr
+1  241.1659 7023596    Africa 47.96863 31.54775 64.38951
+2 1385.4282 7023596    Africa 48.48298 32.06231 64.90365
+3 2529.6905 7023596    Africa 48.99733 32.57670 65.41797
+4 3673.9528 7023596    Africa 49.51169 33.09092 65.93245
+5 4818.2150 7023596    Africa 50.02604 33.60497 66.44711
+6 5962.4773 7023596    Africa 50.54039 34.11885 66.96193</code></pre>
+</div>
+</div>
+<p>Ahora sí… El resultado es una base de datos que contiene valores pronosticados del modelo ajustado, para un rango de valores que nosotros especificamos. Con base en esto podemos visualizar los resultados. Debido a que el producto fue para un rango de valores pronosticados de interés, podemos decidir si utilziar todos, o una parte de estos. Por tanto, fijémonos únicamente en el caso de Europa y América.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> <span class="fu">subset</span>(pred_df,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                          continent <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Europe"</span>, <span class="st">"Americas"</span>)),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> fit,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">ymin =</span> lwr, <span class="at">ymax =</span> upr,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> continent,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">fill =</span> continent,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">group =</span> continent)) <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(data,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                             continent <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Europe"</span>, <span class="st">"Americas"</span>)),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                   <span class="at">color =</span> continent),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Pronóstico por MCO"</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">subtitle =</span> <span class="st">"Europa y América a distintos niveles de PIB per cápita"</span>) <span class="sc">+</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"PIB per cápita (log)"</span>, <span class="at">y =</span> <span class="st">"Estimación"</span>,</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Fuente: elaboración propia con base en datos de gapminder"</span>) <span class="sc">+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>dollar) <span class="sc">+</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_apa</span>(<span class="at">legend.pos =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/predict-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="estimaciones-a-nivel-componente" class="level3">
+<h3 class="anchored" data-anchor-id="estimaciones-a-nivel-componente">Estimaciones a nivel componente</h3>
+<p>El gráfico anterior nos da una idea de los valores pronosticados de expectativa de vida, frente a diferentes niveles de PIB per cápita (en escala logarítmica), tanto para países del continente europeo, como americano. A continuación, lo que haremos será graficar el coeficiente estimado de cada covariante de nuestro modelo, como un punto en un plano donde el eje <span class="math inline">\(X\)</span>, será la estimación, y el eje <span class="math inline">\(Y\)</span> corresponderá a cada covariante.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>out_comp <span class="ot">&lt;-</span> <span class="fu">tidy</span>(out)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>out_comp <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round_df</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 5
+  term              estimate std.error statistic p.value
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)          47.8      0.34     141.     0    
+2 gdpPercap             0        0         19.2    0    
+3 pop                   0        0          3.33   0.001
+4 continentAmericas    13.5      0.6       22.5    0    
+5 continentAsia         8.19     0.571     14.3    0    
+6 continentEurope      17.5      0.625     28.0    0    
+7 continentOceania     18.1      1.78      10.1    0    </code></pre>
+</div>
+</div>
+<p>En este código, lo que hicimos fue tomar el objeto que contiene la estimación del modelo (<code>out</code>), y convertimos los resultados en una base de datos con información a nivel de los covariantes (función <code>tidy()</code>). Finalmente, la segunda parte del código, lo único que hizo fue redondear los decimales a dos posiciones (función <code>round_df</code>).</p>
+<p>Ahora sí…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>out_comp <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> term,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_apa</span>(<span class="at">remove.y.gridlines =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">remove.x.gridlines =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/coefficients-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Sin embargo, siguiendo nuestras recomendaciones, es importante poder pensar en agregar a estos puntos el intervalo de confianza. Para ello, utilicaremos el siguiente código:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>out_conf <span class="ot">&lt;-</span> <span class="fu">tidy</span>(out,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">conf.int =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>out_conf <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round_df</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 7
+  term              estimate std.error statistic p.value conf.low conf.high
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)          47.8      0.34     141.     0        47.1      48.5 
+2 gdpPercap             0        0         19.2    0         0         0   
+3 pop                   0        0          3.33   0.001     0         0   
+4 continentAmericas    13.5      0.6       22.5    0        12.3      14.7 
+5 continentAsia         8.19     0.571     14.3    0         7.07      9.31
+6 continentEurope      17.5      0.625     28.0    0        16.2      18.7 
+7 continentOceania     18.1      1.78      10.1    0        14.6      21.6 </code></pre>
+</div>
+</div>
+<p>Por conveniencia, el operador <code>%nin%</code> está disponible a través de la paquetería <code>socviz</code>, y realiza algo opuesto al operador <code>%in%</code>, seleccionando únicamente los términos en el primer vector de caracteres, que no se encuentran en el segundo. Este operador lo utilizaremos para dejar de lado el término del intercepto de la tabla generada.</p>
+<p>A continuación, nuestro gráfico evitará el intercepto, y manejará las etiquetas de los covariantes de una mejor forma, evitando casos como <code>continentAmericas</code>. Finalmente, <em>por fin</em> podremos ver las líneas que corresponderán al intervalo de confianza, y ordenaremos estas de mayor a menor:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(socviz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'socviz'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:jtools':
+
+    %nin%</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dendroTools':
+
+    round_df</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>out_conf <span class="ot">&lt;-</span> <span class="fu">subset</span>(out_conf,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                   term <span class="sc">%nin%</span> <span class="st">"(Intercept)"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>out_conf<span class="sc">$</span>nicelabs <span class="ot">&lt;-</span> <span class="fu">prefix_strip</span>(out_conf<span class="sc">$</span>term, <span class="st">"continent"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>out_conf <span class="sc">%&gt;%</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(nicelabs, estimate),</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> estimate,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high)) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>() <span class="sc">+</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Efecto estimado sobre expectativa de vida"</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">subtitle =</span> <span class="st">"Coeficientes e intervalos de confianza"</span>) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Estimación MCO"</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Fuente: elaboración propia con base en datos de gapminder"</span>) <span class="sc">+</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_apa</span>(<span class="at">remove.x.gridlines =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">remove.y.gridlines =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/coefficients-plot4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="efectos-marginales" class="level2">
+<h2 class="anchored" data-anchor-id="efectos-marginales">Efectos marginales</h2>
+<p>Hasta ahora, lo que hemos elaborado son visualizaciones sobre estimaciones del efecto promedio de algun coeficiente, manteniendo constantes otros términos de nuestro modelo. Los gráficos de efectos marginales o parciales, en cambio, han obtenido mucha popularidad debido a su utilidad para presentar pronósticos precisos e interpretativos. Particularmente, el interés sobre estos gráficos incrementó gracias dificultades asociadas a la interpretación de términos de modelos de regresión logística, así como a modelos con especificaciones de covariantes en interacción. Para estos, utilizaremos la paquetería <code>margins</code>.</p>
+<p>Para ver cómo funcionan estos gráficos, utilicemos ahora la base de datos <code>gss_sm</code> (General Social Survey), y enfoquémonos en la variable binaria: <code>obama</code>. Esta variable tiene dos posibles valores. Cuando la variable es igual a <span class="math inline">\(1\)</span>, el individuo encuestado indicó haber votado por el ex-presidente estadounidense Barack Obama en las elecciones de 2012; y es igual a <span class="math inline">\(0\)</span> en otros casos.</p>
+<p>Con base en esta información, ajustaremos un modelo de regresión logística sobre la variable <code>obama</code>, con <code>age</code>, <code>polviews</code>, <code>race</code>, y <code>sex</code>, como covariantes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gss_sm<span class="sc">$</span>polviews_m <span class="ot">&lt;-</span> <span class="fu">relevel</span>(gss_sm<span class="sc">$</span>polviews, <span class="at">ref =</span> <span class="st">"Moderate"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>out_bo <span class="ot">&lt;-</span> <span class="fu">glm</span>(obama <span class="sc">~</span> polviews_m <span class="sc">+</span> sex<span class="sc">*</span>race,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> gss_sm)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(out_bo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = obama ~ polviews_m + sex * race, family = "binomial", 
+    data = gss_sm)
+
+Coefficients:
+                                  Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                       0.296493   0.134091   2.211  0.02703 *  
+polviews_mExtremely Liberal       2.372950   0.525045   4.520 6.20e-06 ***
+polviews_mLiberal                 2.600031   0.356666   7.290 3.10e-13 ***
+polviews_mSlightly Liberal        1.293172   0.248435   5.205 1.94e-07 ***
+polviews_mSlightly Conservative  -1.355277   0.181291  -7.476 7.68e-14 ***
+polviews_mConservative           -2.347463   0.200384 -11.715  &lt; 2e-16 ***
+polviews_mExtremely Conservative -2.727384   0.387210  -7.044 1.87e-12 ***
+sexFemale                         0.254866   0.145370   1.753  0.07956 .  
+raceBlack                         3.849526   0.501319   7.679 1.61e-14 ***
+raceOther                        -0.002143   0.435763  -0.005  0.99608    
+sexFemale:raceBlack              -0.197506   0.660066  -0.299  0.76477    
+sexFemale:raceOther               1.574829   0.587657   2.680  0.00737 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2247.9  on 1697  degrees of freedom
+Residual deviance: 1345.9  on 1686  degrees of freedom
+  (1169 observations deleted due to missingness)
+AIC: 1369.9
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+</div>
+<p>En función de lo anterior, podemos ahora graficar nuestros datos de diferentes formas. Con base en la función <code>margins()</code>, ahora calcularemos los efectos marginales de cada variable:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(margins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'margins' was built under R version 4.3.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bo_m <span class="ot">&lt;-</span> <span class="fu">margins</span>(out_bo)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(out_bo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = obama ~ polviews_m + sex * race, family = "binomial", 
+    data = gss_sm)
+
+Coefficients:
+                                  Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                       0.296493   0.134091   2.211  0.02703 *  
+polviews_mExtremely Liberal       2.372950   0.525045   4.520 6.20e-06 ***
+polviews_mLiberal                 2.600031   0.356666   7.290 3.10e-13 ***
+polviews_mSlightly Liberal        1.293172   0.248435   5.205 1.94e-07 ***
+polviews_mSlightly Conservative  -1.355277   0.181291  -7.476 7.68e-14 ***
+polviews_mConservative           -2.347463   0.200384 -11.715  &lt; 2e-16 ***
+polviews_mExtremely Conservative -2.727384   0.387210  -7.044 1.87e-12 ***
+sexFemale                         0.254866   0.145370   1.753  0.07956 .  
+raceBlack                         3.849526   0.501319   7.679 1.61e-14 ***
+raceOther                        -0.002143   0.435763  -0.005  0.99608    
+sexFemale:raceBlack              -0.197506   0.660066  -0.299  0.76477    
+sexFemale:raceOther               1.574829   0.587657   2.680  0.00737 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2247.9  on 1697  degrees of freedom
+Residual deviance: 1345.9  on 1686  degrees of freedom
+  (1169 observations deleted due to missingness)
+AIC: 1369.9
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>bo_gg <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">summary</span>(bo_m))</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>prefixes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"polviews_m"</span>, <span class="st">"sex"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>bo_gg<span class="sc">$</span>factor <span class="ot">&lt;-</span> <span class="fu">prefix_strip</span>(bo_gg<span class="sc">$</span>factor, prefixes)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>bo_gg<span class="sc">$</span>factor <span class="ot">&lt;-</span> <span class="fu">prefix_replace</span>(bo_gg<span class="sc">$</span>factor, <span class="st">"race"</span>, <span class="st">"Race: "</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>bo_gg <span class="sc">%&gt;%</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(factor, AME, lower, upper)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 4
+  factor                     AME    lower   upper
+  &lt;chr&gt;                    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+1 Conservative           -0.412  -0.467   -0.356 
+2 Extremely Conservative -0.454  -0.536   -0.371 
+3 Extremely Liberal       0.268   0.210    0.326 
+4 Liberal                 0.277   0.232    0.322 
+5 Slightly Conservative  -0.266  -0.330   -0.201 
+6 Slightly Liberal        0.193   0.134    0.253 
+7 Race: Black             0.403   0.369    0.437 
+8 Race: Other             0.125   0.0490   0.200 
+9 Female                  0.0443  0.00967  0.0789</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>bo_gg <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(factor, AME),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> AME, <span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper)) <span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"gray80"</span>) <span class="sc">+</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>() <span class="sc">+</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Efectos Marginales Promedio"</span>,</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Fuente: elaboración propia con base en datos de gss_sm"</span>) <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_apa</span>(<span class="at">remove.y.gridlines =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">remove.x.gridlines =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/marginal-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/Prosasmed\.github\.io\/mi-webpage\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
