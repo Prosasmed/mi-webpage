@@ -1,5 +1,33 @@
 [
   {
+    "objectID": "research/index.html",
+    "href": "research/index.html",
+    "title": "Proyectos de investigación",
+    "section": "",
+    "text": "Mis áreas de investigación son la economía política comparada, las políticas públicas, y la educación. Mi especialización se encuentra en las políticas de financiamiento público educativo en México y Latinoamérica, así como en las dinámicas de inversión privada, o por hogar, en la formación educativa. Además, me intereso ampliamente en la política de partidos, ideología gubernamental, sindicatos del sector público educativo, formación de opinión pública, y globalización. Abajo encontrarás una lista con mis proyectos de investigación."
+  },
+  {
+    "objectID": "research/index.html#financiamiento-público-de-la-educación-en-latinoamérica-tesis-doctoral",
+    "href": "research/index.html#financiamiento-público-de-la-educación-en-latinoamérica-tesis-doctoral",
+    "title": "Proyectos de investigación",
+    "section": "Financiamiento público de la educación en Latinoamérica (tesis doctoral)",
+    "text": "Financiamiento público de la educación en Latinoamérica (tesis doctoral)\nMi investigación doctoral analiza la economía política del financiamiento educativo entre países latinoamericanos, y explora la expansión del gasto desde 1990, así como las razones de la priorización de esta a través de gobiernos fundamentalmente conservadores.\nDiferentes investigaciones han mostrado que al decidir niveles de gasto social, los gobiernos responden a presiones de tipo político y económico como, por ejemplo, su propia inclinación ideológica, las preferencias de gasto de su base electoral, o la apertura comercial a mercados internacionales de bienes y servicios. Mi investigación muestra que en Latinoamérica, contrario a lo esperado, la mayoría de países que comenzaron a expandir su inversión en la educación pública, mantenían una cercanía con la derecha política, y sus patrones de gasto no podían ser explicados únicamente por el grado de globalización.\nEn este proyecto muestro que los gobiernos de derecha e izquierda en Latinoamérica, desde 1990, convergieron en niveles de financiamiento público educativo agregado, y desagregado por niveles de enseñanza, debido a la interrelación de su posición ideológica, el grado de apertura comercial, y la presión ejercida a través de sindicatos del sector público educativo.\nRepositorio\n\nLa tesis en trabajo puede ser consultada aquí.\nDatos y códigos en R para replicar el análisis cuantitativo pueden ser consultados aquí."
+  },
+  {
+    "objectID": "research/index.html#gasto-educativo-de-los-hogares-mexicanos",
+    "href": "research/index.html#gasto-educativo-de-los-hogares-mexicanos",
+    "title": "Proyectos de investigación",
+    "section": "Gasto educativo de los hogares mexicanos",
+    "text": "Gasto educativo de los hogares mexicanos\nAcudir a la escuela implica costos, aún y cuando los servicios adquiridos corresponden al sistema educativo público. Sin considerar a las instituciones de enseñanza privada, que son -probablemente- la categoría singular más relevante del gasto educativo por hogar, la adquisición de libros de texto y apoyo, papelería, e incluso el propio transporte hacia los centros escolares, son algunos de los gastos no siempre cubiertos por el sistema público, y que deben ser provistos de forma privada.\nDiferentes investigaciones han mostrado que los hogares, generalmente invierten siguiendo patrones de ingreso y consumo, características sociodemográficas de estos; y necesidades de atención en función del número de miembros que componen la familia, o aquellos que se encuentran en edad de estudiar. Sin embargo, pocos son los estudios que han explorado estas dinámicas en Latinoamérica y México.\nEn este proyecto busco entender la sensibilidad del gasto educativo de los hogares mexicanos, frente a diversas condiciones sociales y económicas. El primer producto de este proyecto, midió la elasticidad del ingreso en la demanda educativa de los hogares mexicanos, utilizando datos de la Encuesta Nacional de Ingresos y Gastos de los Hogares de México (ENIGH, 2020). Con base en los resultados encontrados, actualmente he concentrado mi atención sobre posibles sesgos de género en la distribución del gasto educativo privado.\nPublicaciones & trabajo en progreso\n\nRosas-Medina, P. I. (2024). Entre necesidades y lujos: el gasto educativo de los hogares en México. Revista Mexicana de Investigación Educativa, 29(102), 631-655. Data y archivos para replicar disponibles aquí.\nRosas-Medina, P.I. (2024). Gender bias in Mexican Households’ educational expenditures: Does the schooling level actually matters? Working paper, under review."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Pedro I. Rosas-Medina",
@@ -12,12 +40,5 @@
     "title": "Pedro I. Rosas-Medina",
     "section": "",
     "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
   }
 ]
