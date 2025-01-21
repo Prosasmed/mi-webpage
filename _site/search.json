@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Pedro I. Rosas-Medina",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
   },
   {
     "objectID": "about.html",
@@ -12,5 +12,12 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html#bio",
+    "href": "index.html#bio",
+    "title": "Pedro I. Rosas-Medina",
+    "section": "",
+    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
   }
 ]
