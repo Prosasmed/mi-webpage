@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pedro I. Rosas-Medina">
+<meta name="dcterms.date" content="2025-01-20">
+<meta name="description" content="Análisis de efectos fijos de dos vías, y construcción de gráficos de efectos marginales para estimaciones con covariantes en interacción.">
+
+<title>Efectos marginales condicionales – Pedro I. Rosas-Medina</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-915cd6c369adc0a3a5f20144805f6d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Efectos marginales condicionales – Pedro I. Rosas-Medina">
+<meta property="og:description" content="Análisis de efectos fijos de dos vías, y construcción de gráficos de efectos marginales para estimaciones con covariantes en interacción.">
+<meta property="og:image" content="banner.png">
+<meta property="og:site_name" content="Pedro I. Rosas-Medina">
+<meta property="og:locale" content="es_MX">
+<meta name="twitter:title" content="Efectos marginales condicionales – Pedro I. Rosas-Medina">
+<meta name="twitter:description" content="Análisis de efectos fijos de dos vías, y construcción de gráficos de efectos marginales para estimaciones con covariantes en interacción.">
+<meta name="twitter:image" content="banner.png">
+<meta name="twitter:creator" content="@Pedro0909">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Pedro I. Rosas-Medina</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research"> 
+<span class="menu-text">Investigación</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../conferences"> 
+<span class="menu-text">Conferencias</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Efectos marginales condicionales</h1>
+                  <div>
+        <div class="description">
+          Análisis de efectos fijos de dos vías, y construcción de gráficos de efectos marginales para estimaciones con covariantes en interacción.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Econometrics</div>
+                <div class="quarto-category">tidyverse</div>
+                <div class="quarto-category">ggplot2</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="true">Pedro I. Rosas-Medina</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 20, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#el-caso" id="toc-el-caso" class="nav-link active" data-scroll-target="#el-caso">El caso…</a>
+  <ul class="collapse">
+  <li><a href="#two-way-fixed-effects-models" id="toc-two-way-fixed-effects-models" class="nav-link" data-scroll-target="#two-way-fixed-effects-models">Two-way Fixed Effects Models</a></li>
+  <li><a href="#la-base-de-datos" id="toc-la-base-de-datos" class="nav-link" data-scroll-target="#la-base-de-datos">La base de datos</a></li>
+  <li><a href="#estimación" id="toc-estimación" class="nav-link" data-scroll-target="#estimación">Estimación</a></li>
+  <li><a href="#y-ahora-grafiquemos-resultados" id="toc-y-ahora-grafiquemos-resultados" class="nav-link" data-scroll-target="#y-ahora-grafiquemos-resultados">¿Y ahora? Grafiquemos resultados</a></li>
+  </ul></li>
+  <li><a href="#efectos-marginales-condicionales" id="toc-efectos-marginales-condicionales" class="nav-link" data-scroll-target="#efectos-marginales-condicionales">Efectos marginales condicionales</a>
+  <ul class="collapse">
+  <li><a href="#gráficos-de-efectos-marginales-condicionales" id="toc-gráficos-de-efectos-marginales-condicionales" class="nav-link" data-scroll-target="#gráficos-de-efectos-marginales-condicionales">Gráficos de efectos marginales condicionales</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Antes de que todo lo tuviéramos en nuestros celulares, las fotos las imprimíamos, y las colocábamos en álbumes. ¿Alguna vez viste alguno? Muchas veces, estos <em>libros</em> contaban con páginas y páginas de fotos familiares, donde generalmente aparecían las mismas personas en un mismo lugar: la casa de los abuelos, o el jardín donde la familia jugaba..</p>
+<p>Imagina que estás viendo un álbum de fotos, donde el fondo de cada una de estas es siempre el mismo, pero las personas cambian: crecen, se mudan, cambian de peinado, o incluso de estilo. ¿Cómo podrías analizar estos cambios en tu familia, sin distraerte con el fondo o la decoración propia de la casa donde se tomó la foto? Una forma sería ignorar estos <em>elementos fijos</em>, enfocándote únicamente en las <em>diferencias de un año a otro</em>.</p>
+<p>Pues bien, ¡eso es más o menos lo que hacen los modelos de efectos fijos! En lugar de intentar captar todo, estos modelos “ignoran” las cosas que no cambian con el tiempo (como el fondo en las fotos) y se centran en los cambios dentro de cada grupo o unidad (las personas en las fotos). Esto los convierte en una herramienta fantástica para responder preguntas como: <em>¿Qué pasa cuando una política cambia en un país?</em> o <em>¿Cómo afecta un cambio de estrategia en una empresa a sus resultados?</em></p>
+<p>En esta publicación, no me interesa demasiado explicar la lógica detrás de un modelo de efectos fijos, o los tipos de estos. Joshua D. Angrist &amp; Jörn-Steffen Pischke, por ejemplo, brindan una excelente explicación al respecto en su libro <a href="https://www.mostlyharmlesseconometrics.com">Mostly Harmless Econometrics</a>; mientras que Arne Henningsen &amp; Géraldine Henningsen, en su capítulo <a href="https://www.sciencedirect.com/science/article/abs/pii/B9780128143674000125">Analysis of Panel Data Using R</a>, ofrecen una explicación detallada de este tipo de modelación a través de <code>R</code>.</p>
+<p>En cambio, aquí explicaré un ejemplo que, personalmente, me causó demasiados problemas en mi tesis doctoral: la visualización de efectos marginales condicionales promedio, derivado de estmaciones de modelos de efectos fijos de dos vías.</p>
+<section id="el-caso" class="level2">
+<h2 class="anchored" data-anchor-id="el-caso">El caso…</h2>
+<p>En mi tesis doctoral construí diferentes modelos de efectos fijos de dos vías con el objetivo de entender las razones por las cuales, en Latinoamérica, los países de la región expandieron los niveles de financiamiento público educativo a partir de la década de los 90; y priorizaron sistemáticamente el gasto entre niveles parte de los subsistemas de enseñanza básica, respecto a la educación superior, o profesional.</p>
+<p>Evidentemente, el caso es mucho más amplio, y en este <em>post</em> no quisiera adentrar sobre el <em>por qué</em> de cada covariante incluida en los modelos. Sin embargo, es preciso mencionar <em>por qué</em> un modelo de efectos fijos.</p>
+<section id="two-way-fixed-effects-models" class="level3">
+<h3 class="anchored" data-anchor-id="two-way-fixed-effects-models">Two-way Fixed Effects Models</h3>
+<p>Uno usa modelos de efectos fijos de dos vías cuando lo que intentas es controlar la heterogeneidad no observada que es constante en el tiempo para cada unidad transversal (en español: países, individuos, o incluso empresas), y simultáneamente por factores inobservables que son constantes a través de las unidades en un periodo específico (otra vez, en español: el tiempo).</p>
+<p>¿Pero cuándo es útil este análisis de datos tipo panel?</p>
+<ol type="1">
+<li>Cuando <strong>existen efectos específicos de las unidades</strong>: cuando quieran capturar características inherentes a las unidades (como diferencias culturales, políticas, o estructurales entre países) que no varían en el tiempo.</li>
+<li>Cuando <strong>existen efectos específicos del tiempo</strong>: es decir, cuando quieran modelar influencias comunes a todas las unidades en un momento dado, como <em>shocks</em> macroeconómicos globales, o eventos específicos de un periodo.</li>
+<li>Cuando <strong>la variación dentro de las unidades y a través del tiempo es clave</strong>: es decir, cuando el interés recaiga en identificar relaciones causales utilizando la variación interna de las unidades, descontando los efectos constantes de las unidades y del tiempo.</li>
+</ol>
+</section>
+<section id="la-base-de-datos" class="level3">
+<h3 class="anchored" data-anchor-id="la-base-de-datos">La base de datos</h3>
+<p>La base de datos que emplearemos en este ejemplo es de elaboración propia, y pueden encontrarla en mi <a href="https://github.com/Prosasmed/tesis_flacso.git">Github</a>. En términos generales, este marco de datos es de tipo panel, y cuenta con mucha información sobre educación, economía, contexto político y social de <span class="math inline">\(18\)</span> países latinoamericanos, entre <span class="math inline">\(1970\)</span> y <span class="math inline">\(2018\)</span>. Sobre fuentes de información y demás, una vez más, los invito a que revisen el repositorio, pues ahí tienen todo lo necesario… Sin embargo, quedémonos con esta puntualización para el ejemplo que elaboraremos en este <em>post</em>:</p>
+<ul>
+<li><strong>Variable dependiente</strong>: gasto público educativo de cada gobierno latinoamericano incluido en la muestra, entre 1970 y 2018, como proporción del PIB.</li>
+<li><strong>Variables independientes</strong>:
+<ul>
+<li><em>Ideología gubernamental</em>: variable continua con puntajes de ideología gubernamental, entre una escala restringida entre <span class="math inline">\(1\)</span> y <span class="math inline">\(20\)</span>, donde los extremos representan posiciones ideológicas extremas (izquierda y derecha, respectivamente).</li>
+<li><em>Globalizacón</em>: nivel de globalización del país para el año observado. Promedio entre <span class="math inline">\(0\)</span> y <span class="math inline">\(100\)</span>, donde los extremos representan el nivel de apertura a los mercados internacionales de bienes y servicios (sin globalización y completamente globalizado, respectivamente).</li>
+</ul></li>
+<li><strong>Variables de control</strong>: conjunto de variables de control que definen características sociales y económicas de los gobiernos latinoamericanos para el periodo observado.</li>
+</ul>
+</section>
+<section id="estimación" class="level3">
+<h3 class="anchored" data-anchor-id="estimación">Estimación</h3>
+<p>La estimación de un modelo de efectos fijos de dos vías en <code>R</code>, generalmente sigue la función <code>plm()</code>, de la paquetería <code>plm</code>. El modelo busca evaluar cómo varias variables explicativas impactan en la variable dependiente <code>exp_w1</code>, controlando por heterogeneidad no observada específica de las unidades (en este caso, países) y de los periodos (aquí: años).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>h1_tw2 <span class="ot">&lt;-</span> <span class="fu">plm</span>(exp_w1 <span class="sc">~</span> VP_mean <span class="sc">+</span> KOFGIdj <span class="sc">+</span> VP_mean <span class="sc">*</span> KOFGIdj <span class="sc">+</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                pop_w2 <span class="sc">+</span> pop_w1_ln <span class="sc">+</span> eco_w4 <span class="sc">+</span> eco_w6 <span class="sc">+</span> eco_w16,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> h1,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">model =</span> <span class="st">"within"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">effect =</span> <span class="st">"twoways"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Desglosemos lo anterior:</p>
+<ol type="1">
+<li>La función <code>plm()</code> estima modelos para datos tipo panel:</li>
+</ol>
+<ul>
+<li>La fórmula <code>exp_w1 ~ ...</code> nos dice que:
+<ul>
+<li><code>exp_w1</code> es la variable dependiente,</li>
+<li><code>VP_mean</code> y <code>KOFGIdj</code> son las variables explicativas principales.</li>
+<li><code>VP_mean * KOFGIdj</code> es el término de interacción para analizar si el efecto de la polarización política depende del nivel de globalización.</li>
+<li><code>pop_w2</code>, <code>pop_w1_ln</code>, <code>eco_w4</code>, <code>eco_w6</code>, <code>eco_w16</code> son las variables de control relacionadas a población y economía de los países.</li>
+</ul></li>
+<li><code>data = h1</code> es la base de datos que contiene las variables.</li>
+<li><code>model = "within"</code> especifica un modelo de efectos fijos, que elimina la heterogeneidad no observada constante para cada unidad y cada periodo.</li>
+<li><code>effect = "twoways"</code> indica un modelo de efectos fijos de dos vías, controlando por efectos específicos de las unidades y periodos.</li>
+</ul>
+<p>Ahora podemos ver los resultados:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(h1_tw2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Twoways effects Within Model
+
+Call:
+plm(formula = exp_w1 ~ VP_mean + KOFGIdj + VP_mean * KOFGIdj + 
+    pop_w2 + pop_w1_ln + eco_w4 + eco_w6 + eco_w16, data = h1, 
+    effect = "twoways", model = "within")
+
+Unbalanced Panel: n = 17, T = 10-27, N = 342
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-2.311338 -0.333117  0.037205  0.369118  2.590839 
+
+Coefficients:
+                   Estimate  Std. Error t-value  Pr(&gt;|t|)    
+VP_mean          0.37518739  0.09064829  4.1389 4.639e-05 ***
+KOFGIdj          0.11489022  0.02568127  4.4737 1.125e-05 ***
+pop_w2           0.11828132  0.05723363  2.0666   0.03970 *  
+pop_w1_ln        0.07380443  1.10280716  0.0669   0.94669    
+eco_w4          -0.00013629  0.00005570 -2.4468   0.01504 *  
+eco_w6          -0.03721986  0.01604994 -2.3190   0.02113 *  
+eco_w16          0.02632195  0.02207769  1.1922   0.23419    
+VP_mean:KOFGIdj -0.00569599  0.00135620 -4.2000 3.606e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    137.91
+Residual Sum of Squares: 123.21
+R-Squared:      0.10659
+Adj. R-Squared: -0.10381
+F-statistic: 4.1163 on 8 and 276 DF, p-value: 0.00011713</code></pre>
+</div>
+</div>
+<p>Antes de seguir, interpretemos rápidamente lo encontrado:</p>
+<ul>
+<li><strong><code>VP_mean</code> (polarización ideológica)</strong>: Un aumento en la polarización incrementa significativamente el gasto educativo (coeficiente <span class="math inline">\(= 0.375, p &lt; 0.001\)</span>).</li>
+<li><strong><code>KOFGIdj</code> (globalización)</strong>: La globalización también tiene un efecto positivo y significativo sobre el gasto educativo (coeficiente <span class="math inline">\(= 0.115, p &lt; 0.001\)</span>).</li>
+<li><strong>Interacción <code>VP_mean:KOFGIdj</code></strong>: El coeficiente de <span class="math inline">\(-0.0057 (p &lt; 0.001)\)</span> indica que el efecto positivo de la polarización disminuye a medida que aumenta el grado de globalización.</li>
+<li>El <strong>R-cuadrado</strong> (<span class="math inline">\(0.107\)</span>) indica que el modelo explica aproximadamente el <span class="math inline">\(10.7\%\)</span> de la variación en el gasto educativo. Este nivel de ajuste es común en modelos de datos panel con efectos fijos, donde gran parte de la variación ya está controlada por efectos no observados.</li>
+<li>Por tanto, la polarización ideológica y la globalización tienen efectos significativos sobre el gasto educativo público. Sin embargo, la interacción negativa entre ambas variables sugiere que la globalización modera el impacto de la polarización, disminuyendo su efecto positivo a medida que los niveles de globalización aumentan.</li>
+</ul>
+<p>Con el objetivo de garantizar que los errores estándar reportados sean <strong>robustos a la heterocedasticidad</strong>, a continuación, se calculan estos a través de la función <code>coeftest()</code>. Este paso es <strong>fundamental</strong> en el análisis de datos tipo panel, donde la varianza de los errores puede no ser constante entre observaciones, lo que podría sesgar las inferencias estadísticas si no se corrige.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(h1_tw2, <span class="at">vcov =</span> <span class="fu">vcovHC</span>(h1_tw2, <span class="at">type =</span> <span class="st">"HC1"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+                   Estimate  Std. Error t value Pr(&gt;|t|)  
+VP_mean          0.37518739  0.17180062  2.1839  0.02981 *
+KOFGIdj          0.11489022  0.04793220  2.3969  0.01720 *
+pop_w2           0.11828132  0.11752730  1.0064  0.31510  
+pop_w1_ln        0.07380443  3.17545949  0.0232  0.98147  
+eco_w4          -0.00013629  0.00013802 -0.9874  0.32430  
+eco_w6          -0.03721986  0.02317632 -1.6059  0.10943  
+eco_w16          0.02632195  0.04029425  0.6532  0.51414  
+VP_mean:KOFGIdj -0.00569599  0.00272008 -2.0940  0.03717 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="y-ahora-grafiquemos-resultados" class="level3">
+<h3 class="anchored" data-anchor-id="y-ahora-grafiquemos-resultados">¿Y ahora? Grafiquemos resultados</h3>
+<p>¡Ya… casi! Ahora vamos con el propósito de este <em>post</em>: el análisis de efectos marginales condicionales para ilustrar la forma en que el efecto de la ideología <code>VP_mean</code>, varía sobre el gasto educativo <code>exp_w1</code>, según el nivel de globalización <code>KOFGIdj</code>. A continuación, desglosaré qué es este tipo de análisis visual, y cómo se construye en <code>R</code> a través del ejemplo en cuestión.</p>
+</section>
+</section>
+<section id="efectos-marginales-condicionales" class="level2">
+<h2 class="anchored" data-anchor-id="efectos-marginales-condicionales">Efectos marginales condicionales</h2>
+<p>En ciencias sociales, y fundamentalmente, en ciencia política, la mayoría de argumentos teóricos postulan que el efecto de ciertas variables varía dependiendo del contexto social, político, económico, o estratégico… Por tanto, encontrar modelos econométricos como el de este ejemplo, donde se postula una interacción entre variables, es algo muy usual en la vida real. Pero, ¿qué quiero decir con esto?</p>
+<p>El ejemplo de este <em>post</em> aborda una hipótesis condicional que sigue una estructura estándar en la literatura sobre efectos marginales condicionales. Específicamente, se plantea que la <strong>posición ideológica gubernamental</strong> (<span class="math inline">\(X\)</span>) tiene un efecto positivo sobre el <strong>gasto público educativo</strong> (<span class="math inline">\(Y\)</span>), cuyo impacto se ve amplificado a medida que <strong>la globalización</strong> (<span class="math inline">\(Z\)</span>) aumenta. Formalmente, la hipótesis puede expresarse como una interacción entre <span class="math inline">\(X\)</span> y <span class="math inline">\(Z\)</span>, donde el efecto de <span class="math inline">\(X\)</span> sobre <span class="math inline">\(Y\)</span> depende del valor de <span class="math inline">\(Z\)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+Y_{it} = \beta_0 + \beta_1 X_{it} + \beta_2 Z_t + \beta_3 (X_{it} \times Z_{it}) + \alpha_i + \lambda_t + \epsilon_{it}
+\end{equation}\]</span></p>
+<p>Donde:</p>
+<ul>
+<li><strong><span class="math inline">\(Y_{it}\)</span></strong>: Gasto público educativo de país <span class="math inline">\(i\)</span> en el tiempo <span class="math inline">\(t\)</span>.</li>
+<li><strong><span class="math inline">\(X_{it}\)</span></strong>: Posición ideológica del gobierno del país <span class="math inline">\(i\)</span> en el tiempo <span class="math inline">\(t\)</span>.</li>
+<li><strong><span class="math inline">\(Z_{it}\)</span></strong>: Nivel de globalización en el tiempo <span class="math inline">\(t\)</span>.</li>
+<li><strong><span class="math inline">\(X_{it} \times Z_{it}\)</span></strong>: Término de interacción entre la ideología del gobierno y la globalización.</li>
+<li><strong><span class="math inline">\(\alpha_i\)</span></strong>: Efectos fijos por unidad (por ejemplo, país).</li>
+<li><strong><span class="math inline">\(\lambda_t\)</span></strong>: Efectos fijos por tiempo (por ejemplo, año).</li>
+<li><strong><span class="math inline">\(\epsilon_{it}\)</span></strong>: Error aleatorio.</li>
+</ul>
+<p>Pero, <strong>¿qué es el efecto marginal condicional?</strong> Este concepto refiere a la variación en la expectativa de la variable dependiente ante un cambio en una variable independiente, condicionado a un valor específico de otra variable, que puede estar involucrada en una interacción, o estar controlada por otros factores. El concepto, por tanto, permite entender cómo cambia la relación entre las variables frente a diferentes contextos, proporcionando una interpretación más precisa sobre las dinámicas subyacentes del modelo. ¿Y cómo lo obtenemos?</p>
+<p>Para el modelo en cuestión, el efecto marginal de <span class="math inline">\(X_{it}\)</span>, está dado por</p>
+<p><span class="math display">\[\begin{equation}
+\frac{\partial Y_{it}}{\partial X_{it}} = \beta_1 X_{it} + \beta_3 Z.
+\end{equation}\]</span></p>
+<p>Por tanto, a menos que el coeficiente asociado al producto (<span class="math inline">\(\beta_{3}\)</span>) sea igual a <span class="math inline">\(0\)</span>, el efecto marginal de <span class="math inline">\(X_{it}\)</span> es condicional al valor de <span class="math inline">\(Z_{it}\)</span>.</p>
+<p>En resumen: la interacción entre las variables de ideología gubernamental y globalización implica que el efecto de la posición ideológica gubernamental sobre el gasto público educativo no es constante, sino que depende del punto de apertura comercial a los mercados internacionales de bienes y servicios en el que se encuentre cada gobierno en un periodo específico. En otras palabras, el impacto de la ideología sobre el gasto se intensifica o atenúa según el contexto global en el que se encuentre el país.</p>
+<p>Este tipo de interacción es crucial para obtener una comprensión más completa de las relaciones entre variables en contextos dinámicos. Así, el efecto marginal condicional nos permitirá observar cómo cambia el impacto de una variable en función de otra, proporcionando una perspectiva más detallada sobre cómo las variables actúan conjuntamente dentro de un marco empírico como el que estamos analizando en este ejemplo.</p>
+<section id="gráficos-de-efectos-marginales-condicionales" class="level3">
+<h3 class="anchored" data-anchor-id="gráficos-de-efectos-marginales-condicionales">Gráficos de efectos marginales condicionales</h3>
+<p>Antes de iniciar a construir el <code>ggplot</code> del gráfico de efectos marginales condicionales, lo primero que haremos es generar un vector de valores numéricos entre <span class="math inline">\(0\)</span> y <span class="math inline">\(100\)</span>, con el objetivo de forzar el cálculo de los efectos marginales condicionales sobre todo el rango posible de valores que puede tener la variable condicionand (<span class="math inline">\(Z\)</span>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>koffgi_values <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">100</span>, <span class="at">by =</span> <span class="fl">0.20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Con base en esto, ahora calcularemos los efectos marginales condicionales promedio para los valores específicos de <span class="math inline">\(Z\)</span>. Para ello, utilizaremos la función <code>avg_slopes()</code> de la paquetería <code>marginaleffects</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>c_me_unobserved_avg <span class="ot">&lt;-</span> marginaleffects<span class="sc">::</span><span class="fu">avg_slopes</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> h1_tw2,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">KOFGIdj =</span> koffgi_values),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"VP_mean"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"KOFGIdj"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">conf_level =</span> <span class="fl">0.90</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>¿Qué hicimos?</p>
+<ul>
+<li><code>model = h1_tw2</code> es el modelo previamente ajustado con la función <code>plm()</code>, en el que se estimaron los efectos fijos de dos vías para el gasto público educativo, la ideología y la globalización.</li>
+<li><code>newdata = datagrid(KOFGIdj = koffgi_values)</code>: Esta línea define un conjunto de datos simulado con diferentes valores de la variable <code>KOFGIdj</code> (nivel de globalización). Este nuevo conjunto de datos se utiliza para evaluar cómo cambia el efecto de <code>VP_mean</code> (ideología gubernamental) en función de los valores de <code>KOFGIdj</code>.</li>
+<li><code>variables = "VP_mean"</code>: Especifica que los efectos marginales deben calcularse para la variable <code>VP_mean</code>, que es la posición ideológica del gobierno.</li>
+<li><code>by = "KOFGIdj"</code>: Indica que los efectos marginales de <code>VP_mean</code> deben calcularse para cada nivel de <code>KOFGIdj</code> (globalización), es decir, el cálculo se realiza de forma condicionada a los valores de esta variable.</li>
+<li><code>conf_level = 0.90</code>: Establece el nivel de confianza para los intervalos de confianza calculados, en este caso, un intervalo de confianza del <span class="math inline">\(90\%\)</span>.</li>
+</ul>
+<p>Ahora sí, veamos nuestro gráfico de efectos marginales condicionales promedio:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>c_me_unobserved_avg <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> KOFGIdj, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.00</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">"grey25"</span>) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"dodgerblue2"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"black"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="st">"dotdash"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">fill =</span> <span class="st">"darkgrey"</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Efectos marginales condicionales"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">subtitle =</span> <span class="st">"Ideología, Globalización y Gasto Público Educativo"</span>) <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nivel de globalización"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Efecto de la ideología"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Fuente: elaboración propia con datos del Banco Mundial"</span>) <span class="sc">+</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_apa</span>(<span class="at">x.font.size =</span> <span class="dv">10</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">y.font.size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Pero, ¿qué con esto? El gráfico nos dice mucho, pero vamos por partes.</p>
+<p>En general, <strong>el gráfico devela una pendiente negativa debido al coeficiente</strong> <span class="math inline">\(\beta_{3}\)</span> encontrado bajo la condición de interacción. De esto se deduce que:</p>
+<ol type="1">
+<li>Cuando los países de la región se encuentran bajo condiciones económicas de completo cierre a los mercados internacionales de bienes y servicios, el efecto marginal de un movimiento ideológico gubernamental en una unidad hacia la derecha (más conservadores), se asociaría con un incremento significativo de <span class="math inline">\(0.38\)</span> puntos porcentuales sobre el financiamiento público del sector.</li>
+</ol>
+<p>Sin embargo, esto no es todo. ¿Qué más podemos inferir?</p>
+<ol start="2" type="1">
+<li>Cuanto más globalizado se encuentra un país, la relación observada tendería a decrecer en magnitud. Es decir: una vez que los países se globalizan por encima del <span class="math inline">\(65.86\%\)</span>, la promoción de políticas con un impacto superior sobre el fenómeno resultaría en retracciones bajo gobiernos ideológicamente de derecha, y el gasto educativo público total, o agregado.</li>
+</ol>
+<p>Si… ¿pero qué hay de la línea punteada horizontal en <span class="math inline">\(0\)</span>?</p>
+<p>El punto anterior nos da una pista. Hay un punto, específicamente en <span class="math inline">\(65.86\%\)</span> de globalización, donde el efecto marginal de <span class="math inline">\(X_{it}\)</span> (ideología) sobre <span class="math inline">\(Y_{it}\)</span> (gasto educativo) es neutro… por eso la línea punteada horizontal en <span class="math inline">\(0\)</span>: pues es aquí donde el efecto, valga la redundancia, es <strong>nulo</strong>. ¿Y cómo se obtiene? Recordemos: el efecto marginal condicional (<span class="math inline">\(ME\)</span>) de <span class="math inline">\(X_{it}\)</span> sobre <span class="math inline">\(Y_{it}\)</span> dado <span class="math inline">\(Z_{it}\)</span> está dado por:</p>
+<p><span class="math display">\[\begin{equation}
+ME(X_{it} \mid Z_{it}) = \frac{\partial Y_{it}}{\partial X_{it}} = \beta_1 X_{it} + \beta_3 Z.
+\end{equation}\]</span></p>
+<p>Por tanto, el punto donde <span class="math inline">\(ME(X_{it} \mid Z_{it}) = 0\)</span>, se encuentra resolviendo la derivada parcial de <span class="math inline">\(X_{it}\)</span> dado <span class="math inline">\(Z_{it}\)</span>, es decir:</p>
+<p><span class="math display">\[\begin{equation}
+\beta_1 X_{it} + \beta_3 Z_{it} = 0
+\end{equation}\]</span></p>
+<p>Entonces, tenemos que para <span class="math inline">\(Z_{it}\)</span></p>
+<p><span class="math display">\[\begin{align}
+Z_{it} &amp;= -\frac{\beta_{1} X_{it}}{\beta_{3} Z_{it}},\\
+-\frac{0.37518739}{-0.00569599} = 65.86
+\end{align}\]</span></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
