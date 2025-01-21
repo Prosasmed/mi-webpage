@@ -36,3 +36,4 @@ Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política p
 Por formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.
 
 En este sitio comparto fundamentalmente [mis proyectos de investigación](papers), [conferencias](talks), [proyectos de enseñanza](teaching), y [mi CV](cv.pdf), así como un [blog técnico](blog.html) donde comparto RCode.
+:::
