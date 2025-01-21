@@ -21,7 +21,12 @@ website:
       - text: "Blog"
         href: blog.html
   page-footer:
-    left: "Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites."
+    border: true
+    left: |
+      Powered by [{{< iconify simple-icons:quarto >}} Quarto](https://quarto.org).
+    right: |
+      Pedro I. Rosas-Medina 2025.
+      
 
 format:
   html:
