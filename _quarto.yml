@@ -1,21 +1,28 @@
 project:
   type: website
+  resources:
+    - cv.pdf
 
 website:
   title: "Pedro I. Rosas-Medina"
+  description: "Análisis de Datos y Ciencia Política"
+  open-graph:
+    locale: es_MX
+  twitter-card:
+    creator: "@Pedro0909"
   navbar:
-    left:
+    right:
       - href: index.qmd
         text: Inicio
       - about.qmd
+  page-footer:
+    left: "Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites."
 
 format:
   html:
-    theme:
-      - cosmo
-      - brand
+    theme: [sandstone, _variables.scss]
     css: styles.css
-    toc: true
+    toc: false
 
 
 

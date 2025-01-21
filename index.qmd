@@ -14,12 +14,11 @@ about:
       icon: inbox
       url: "mailto:prosasmed@gmail.com"
     - text: Blog
-      icon: pencil-square
+      icon: rss
       url: "blog.html"
     - text: CV
       url: "cv.pdf"
-    - text: X
-      icon: twitter-x
+    - icon: twitter-x
       url: "https://x.com/Pedro0909"
 comments: FALSE
 ---
