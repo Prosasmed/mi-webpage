@@ -13,9 +13,6 @@ about:
     - text: Email
       icon: inbox
       url: "mailto:prosasmed@gmail.com"
-    - text: Blog
-      icon: rss
-      url: "blog.html"
     - text: CV
       url: "cv.pdf"
     - icon: twitter-x
