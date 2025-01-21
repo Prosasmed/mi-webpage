@@ -1,6 +1,29 @@
 ---
-title: "Prosasmed.github.io"
+title: "Pedro I. Rosas-Medina"
+image: avatar.jpg
+about:
+  template: trestles
+  links:
+    - text: LinkedIn
+      icon: linkedin
+      url: "https://www.linkedin.com/in/pedro-rosas/"
+    - text: GitHub
+      icon: github
+      url: "https://github.com/Prosasmed"
+    - text: Email
+      icon: inbox
+      url: "mailto:prosasmed@gmail.com"
+    - text: Blog
+      icon: pencil-square
+      url: "blog.html"
+    - text: CV
+      url: "cv.pdf"
+    - text: X
+      icon: twitter-x
+      url: "https://x.com/Pedro0909"
+comments: FALSE
 ---
+::: {.column-page}
 
 This is a Quarto website.
 

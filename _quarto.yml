@@ -2,11 +2,11 @@ project:
   type: website
 
 website:
-  title: "Prosasmed.github.io"
+  title: "Pedro I. Rosas-Medina"
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Inicio
       - about.qmd
 
 format:
