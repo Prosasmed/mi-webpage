@@ -14,7 +14,8 @@ website:
     right:
       - href: index.qmd
         text: Inicio
-      - about.qmd
+      - text: "Investigación"
+        href: research
   page-footer:
     left: "Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites."
 

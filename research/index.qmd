@@ -1,0 +1,29 @@
+---
+title: "Proyectos de investigación"
+---
+Mis áreas de investigación son la economía política comparada, las políticas públicas, y la educación. Mi especialización se encuentra en las políticas de financiamiento público educativo en México y Latinoamérica, así como en las dinámicas de inversión privada, o por hogar, en la formación educativa. Además, me intereso ampliamente en la política de partidos, ideología gubernamental, sindicatos del sector público educativo, formación de opinión pública, y globalización. Abajo encontrarás una lista con mis proyectos de investigación.
+
+## Financiamiento público de la educación en Latinoamérica (tesis doctoral)
+Mi investigación doctoral analiza la economía política del financiamiento educativo entre países latinoamericanos, y explora la expansión del gasto desde 1990, así como las razones de la priorización de esta a través de gobiernos fundamentalmente conservadores.
+
+Diferentes investigaciones han mostrado que al decidir niveles de gasto social, los gobiernos responden a presiones de tipo político y económico como, por ejemplo, su propia inclinación ideológica, las preferencias de gasto de su base electoral, o la apertura comercial a mercados internacionales de bienes y servicios. Mi investigación muestra que en Latinoamérica, contrario a lo esperado, la mayoría de países que comenzaron a expandir su inversión en la educación pública, mantenían una cercanía con la derecha política, y sus patrones de gasto no podían ser explicados únicamente por el grado de globalización.
+
+En este proyecto muestro que los gobiernos de derecha e izquierda en Latinoamérica, desde 1990, convergieron en niveles de financiamiento público educativo agregado, y desagregado por niveles de enseñanza, debido a la interrelación de su posición ideológica, el grado de apertura comercial, y la presión ejercida a través de sindicatos del sector público educativo.
+
+**Repositorio**
+
+* La tesis en trabajo puede ser consultada [aquí](tesis.pdf).
+* Datos y códigos en R para replicar el análisis cuantitativo pueden ser consultados [aquí](https://github.com/Prosasmed/tesis_flacso.git).
+
+## Gasto educativo de los hogares mexicanos
+Acudir a la escuela implica costos, aún y cuando los servicios adquiridos corresponden al sistema educativo público. Sin considerar a las instituciones de enseñanza privada, que son -probablemente- la categoría singular más relevante del gasto educativo por hogar, la adquisición de libros de texto y apoyo, papelería, e incluso el propio transporte hacia los centros escolares, son algunos de los gastos no siempre cubiertos por el sistema público, y que deben ser provistos de forma privada.
+
+Diferentes investigaciones han mostrado que los hogares, generalmente invierten siguiendo patrones de ingreso y consumo, características sociodemográficas de estos; y necesidades de atención en función del número de miembros que componen la familia, o aquellos que se encuentran en edad de estudiar. Sin embargo, pocos son los estudios que han explorado estas dinámicas en Latinoamérica y México.
+
+En este proyecto busco entender la sensibilidad del gasto educativo de los hogares mexicanos, frente a diversas condiciones sociales y económicas. El primer producto de este proyecto, midió la elasticidad del ingreso en la demanda educativa de los hogares mexicanos, utilizando datos de la [Encuesta Nacional de Ingresos y Gastos de los Hogares de México](https://www.inegi.org.mx/programas/enigh/nc/2022/) (ENIGH, [2020](https://www.inegi.org.mx/programas/enigh/nc/2020/)). Con base en los resultados encontrados, actualmente he concentrado mi atención sobre posibles sesgos de género en la distribución del gasto educativo privado.
+
+**Publicaciones \& trabajo en progreso**
+
+* Rosas-Medina, P. I. (2024). [Entre necesidades y lujos: el gasto educativo de los hogares en México](https://www.scielo.org.mx/scielo.php?pid=S1405-66662024000300631&script=sci_arttext). _Revista Mexicana de Investigación Educativa_, _29_(102), 631-655. Data y archivos para replicar disponibles [aquí](https://github.com/Prosasmed/gasto_eduprivado_M-xico.git).
+
+* Rosas-Medina, P.I. (2024). [Gender bias in Mexican Households' educational expenditures: Does the schooling level actually matters?](https://scholar.google.com/citations?user=FxnueEgAAAAJ&hl=en) **Working paper, under review**.
