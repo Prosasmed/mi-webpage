@@ -24,6 +24,6 @@ En este proyecto busco entender la sensibilidad del gasto educativo de los hogar
 
 **Publicaciones \& trabajo en progreso**
 
-* Rosas-Medina, P. I. (2024). [Entre necesidades y lujos: el gasto educativo de los hogares en México](https://www.scielo.org.mx/scielo.php?pid=S1405-66662024000300631&script=sci_arttext). _Revista Mexicana de Investigación Educativa_, _29_(102), 631-655. Data y archivos para replicar disponibles [aquí](https://github.com/Prosasmed/gasto_eduprivado_M-xico.git).
+* Rosas-Medina, P. I. (2024). [Entre necesidades y lujos: el gasto educativo de los hogares en México](https://www.scielo.org.mx/scielo.php?pid=S1405-66662024000300631&script=sci_arttext). _Revista Mexicana de Investigación Educativa_, _29_(102), 631-655. Data y archivos para replicar disponibles [aquí](https://github.com/Prosasmed/gasto_eduprivado_M-xico.git). Versión libre [disponible](RosasMedinaPIRMIE.pdf).
 
 * Rosas-Medina, P.I. (2024). [Gender bias in Mexican Households' educational expenditures: Does the schooling level actually matters?](https://scholar.google.com/citations?user=FxnueEgAAAAJ&hl=en) **Working paper, under review**.
