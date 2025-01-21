@@ -18,6 +18,8 @@ website:
         href: research
       - text: "Conferencias"
         href: conferences
+      - text: "Blog"
+        href: blog.html
   page-footer:
     left: "Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites."
 

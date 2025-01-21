@@ -1,0 +1,17 @@
+---
+title: "Data Blog"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: TRUE
+  sort-ui: FALSE
+  filter-ui: FALSE
+  feed:
+    categories: ["R"]
+page-layout: full
+title-block-banner: false
+---
+::: {.column-page}
+
+:::

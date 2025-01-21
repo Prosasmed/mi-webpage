@@ -1,0 +1,8 @@
+# Las opciones especificadas aqui aplicaran a todos los posts de esta carpeta
+
+# Freeze computational output
+#(vease https://quarto.org/docs/projects/code-execution.html#freeze)
+freeze: TRUE
+
+# Activa estilo sobre los bloques de titulo
+title-block-banner: TRUE
