@@ -1,0 +1,1354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Pedro I. Rosas-Medina</title>
+<link>https://Prosasmed.github.io/mi-webpage/blog.html</link>
+<atom:link href="https://Prosasmed.github.io/mi-webpage/blog.xml" rel="self" type="application/rss+xml"/>
+<description>Análisis de Datos y Ciencia Política</description>
+<generator>quarto-1.6.40</generator>
+<lastBuildDate>Wed, 15 Jan 2025 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Visualización de relaciones bivariadas</title>
+  <dc:creator>Pedro I. Rosas-Medina</dc:creator>
+  <link>https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>En las ciencias sociales, frecuentemente nos interesamos en interrogantes que implican explorar relaciones entre variables. Una forma usual y efectiva de entender la manera en que dos variables se relacionan, es a través de la visualización de gráficos. Sin embargo, la forma estética que estos adquieren, depende en la distinción e identificación de qué clase de variables se encuentran en nuestra relación de interés.</p>
+<p>Al examinar relaciones bivariadas entre dos variables categóricas, una aproximación común y efectiva es el uso de gráficos de barras apilados, agrupados, o segmentados. Con estos, el análisis permite comparar frecuencias o proporciones entre las categorías que conforman cada variable (por ejemplo, la frecuencia de mujeres u hombres dentro de una muestra; o el nivel educativo de las personas que la componen). Por otro lado, cuando las variables involucradas son de corte cuantitativo o numérico, los gráficos de dispersión -o <em>scatterplots</em>, son la opción más adecuada, pues facilitan visualizar correlaciones, o patrones de asociación entre las dos variables de interés, permitiendo identificar tendencias, relaciones lineales o no lineales, así como la presencia de posibles valores atípicos.</p>
+<p>A pesar de que los gráficos de dispersión suelen ser sencillos de interpretar, es muy usual encontrar ejemplos muy poco claros, con exceso de elementos visuales, desdén por el contexto de los propios datos, uso inadecuado de colores, o inconsistencias como la combinación de datos que no tienen una relación coherente o comparable.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En este blog ahondaré, paso por paso, cómo construir gráficos de dispersión adecuados utilizando <code>ggplot2</code>, una paquetería en <code>R</code> que forma parte del ecosistema <code>tidyverse</code> diseñada para crear visualizaciones de datos de forma flexible, intuitiva, y estéticamente atractiva. Para estos ejemplos, usaremos la base de datos de <strong>Gapminder Foundation</strong>, <code>gapminder</code>, que incluye estadísticas históricas sobre desarrollo humano a nivel global, y que es altamente utilizada para el análisis y visualización de información. Para ello, utilicemos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> gapminder<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>gapminder <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb1-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">gdpPercap =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log10</span>(gdpPercap))</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(gapminder)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  country     continent  year lifeExp      pop gdpPercap
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333      779.
+2 Afghanistan Asia       1957    30.3  9240934      821.
+3 Afghanistan Asia       1962    32.0 10267083      853.
+4 Afghanistan Asia       1967    34.0 11537966      836.
+5 Afghanistan Asia       1972    36.1 13079460      740.
+6 Afghanistan Asia       1977    38.4 14880372      786.</code></pre>
+</div>
+</div>
+<p>Como podemos ver, esta es una base de datos tipo panel, con seis variables: <code>country</code>, <code>continent</code>, <code>year</code>, <code>lifeExp</code>, <code>pop</code>, y <code>gdpPercap</code>. Para estos ejemplos, nos concentraremos en las variables <code>lifeExp</code>, y <code>gdpPercap</code>, que miden la expectativa de vida (en años), y el PIB per cápita de los países del mundo (en escala logarítmica), respectivamente.</p>
+<section id="gráficos-de-dispersión-simples" class="level2">
+<h2 class="anchored" data-anchor-id="gráficos-de-dispersión-simples">Gráficos de dispersión simples</h2>
+<p>Crear un gráfico de dispersión simple con <code>ggplot</code> requiere tres componentes:</p>
+<ol type="1">
+<li><code>data %&gt;%</code>: el marco de datos seguido del operador <code>%&gt;%</code>, o pipe, que <em>pasa</em> directamente la base de datos como entrada a <code>ggplot()</code>.</li>
+<li><code>ggplot()</code>: que inicia la construcción del gráfico. Dentro de los paréntesis definiremos la estética del gráfico a través de <code>aes()</code>, es decir, cómo se asignarán:</li>
+</ol>
+<ul>
+<li><code>x = gdpPercap</code>,</li>
+<li><code>y = lifeExp</code>,
+<ul>
+<li>Es decir, las variables en los ejes <code>X</code> y <code>Y</code>, respectivamente.</li>
+</ul></li>
+</ul>
+<ol start="3" type="1">
+<li><code>geom_point()</code>: que añadirá los puntos al gráfico, donde cada punto representará una observación (en este caso, un país-año). Sin esta función, únicamente podríamos observar un plano, sin ningún elemento estético dentro.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb3-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Sin embargo, este ejemplo nos permite ver algunos errores comunes. En primer lugar, es notorio el severo <em>overplotting</em> de los puntos, o el uso de etiquetas de ejes asignadas por <em>default</em> según el nombre de las variables graficadas. Además, la visualización carece de un título y/o subtítulo que explique el propósito del gráfico, y la información encontrada no dice mucho más.</p>
+<p>Ahora, veamos cómo cambia al momento de añadir algunas especificaciones adicionales al código inicial:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb4-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodgerblue"</span>,</span>
+<span id="cb4-5">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb4-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb4-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb4-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb4-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb4-14">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb4-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-17">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb4-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb4-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb4-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-22">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Este nuevo código añadió lo siguiente:</p>
+<ol type="1">
+<li>Ajuste del color</li>
+</ol>
+<ul>
+<li>Dentro de la función <code>geom_point()</code>, especificamos que el color de los puntos sería igual a <code>dodgerblue</code>, su tamaño sería de <code>1.5</code> puntos, y añadimos transparencia igual a <code>0.8</code>, con el objetivo de reducir manchas, y distinguir más observaciones.</li>
+</ul>
+<ol start="2" type="1">
+<li>Información descriptiva:</li>
+</ol>
+<ul>
+<li>A través de la función <code>ggtitle()</code> indicamos el título, y subtítulo, entre comillas, para nuestro gráfico.</li>
+<li>La función <code>labs()</code> permitió especificar las etiquetas de los ejes <code>X</code> y <code>Y</code>, de tal forma que ahora, estas sustituyen los nombres de las variables.
+<ul>
+<li>Adicionalmente, la especificación <code>caption =</code>, da la posibilidad de añadir texto adicional al pie del gráfico. Esto es muy útil al momento de colocar, por ejemplo, la fuente de la información, o una nota aclaratoria.</li>
+</ul></li>
+</ul>
+<ol start="3" type="1">
+<li>Selección de un tema:</li>
+</ol>
+<ul>
+<li>La función <code>theme_classic()</code> añadió una personalización de apariencia al gráfico.
+<ul>
+<li>Los temas en <code>ggplot2</code> sirven para controlar elementos como colores de fondo, tamaños, y estilos de texto, líneas, cuadrículas y posiciones de leyendas. Esto da la posibilidad de mejorar la estética, y adaptarla a contextos específicos, garantizando que el diseño sea claro y profesional.</li>
+</ul></li>
+</ul>
+<ol start="4" type="1">
+<li>Control adicional de elementos distintos a los datos:</li>
+</ol>
+<ul>
+<li>Mediante la función <code>theme()</code>, añadimos controles adicionales al título (<code>plot.title =</code>), subtítulo (<code>plot.subtitle =</code>), fuente (<code>plot.caption =</code>), etiquetas de ejes (<code>axis.title =</code>), y texto de los ejes (<code>axis.text =</code>) del gráfico.</li>
+</ul>
+</section>
+<section id="gráficos-de-dispersión-agrupados" class="level2">
+<h2 class="anchored" data-anchor-id="gráficos-de-dispersión-agrupados">Gráficos de dispersión agrupados</h2>
+<p>Estos gráficos pueden ser considerados oportunos y efectivos en algunos contextos. Sin embargo, en diferentes situaciones podríamos considerar añadir niveles adicionales de análisis y profundidad a través de gráficos de dispersión agupados, donde el verdadero asunto ya no es únicamente observar la relación entre una variable cuantitativa <em>A</em> y otra del mismo tipo <em>B</em>, sino contrastar ambas frente a una variable categórica. Los <em>scatterplots</em> agrupados tienen diferentes razones de ser:</p>
+<ol type="1">
+<li><strong>Comparación entre categorías</strong>: permiten observar diferencias o patrones específicos en subgrupos como el género, regiones geográficas, o categorías socioeconómicas.</li>
+<li><strong>Identificación de patrones ocultos</strong>: con estos es posible detectar tendencias o relaciones que un gráfico simple podría ocultar debido a la agregación.</li>
+<li><strong>Mayor riqueza interpretativa</strong>: incluir agrupaciones mejora el contexto y facilita conclusiones más detalladas.</li>
+<li><strong>Facilidad para resaltar diferencias</strong>: permiten identificar visualmente subgrupos que se desvían del patrón general, algo clave para detectar sesgos, excepciones o grupos destacados.</li>
+<li><strong>Comunicación clara</strong>: en análisis y presentaciones, es más intuitivo y efectivo mostrar cómo se comportan los datos dentro de categorías relevantes, en lugar de asumir que un solo gráfico puede explicarlo todo.</li>
+</ol>
+<section id="agrupación-por-color" class="level3">
+<h3 class="anchored" data-anchor-id="agrupación-por-color">Agrupación por color</h3>
+<p>Una forma sencilla y eficaz de visualizar el agrupamiento de datos por categorías, es a través de la especificación de colores. En nuestro ejemplo, cada uno de los países se agrupa según el continente de ubicación. En este sentido, podría ser de interés visualizar de forma clara, cada uno de los puntos del gráfico según esta categoría de agrupamiento.</p>
+<p><code>ggplot</code> nos brinda esta oportunidad. Para ello, lo que realizamos es muy intuitivo: retomar nuestro código generado, y dentro de la función <code>aes()</code>, dentro también de <code>ggplot()</code>, especificamos que el color de los puntos en el gráfico, deberá asignarse según la variable <code>continent</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb5-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb5-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb5-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb5-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb5-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb5-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb5-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb5-14">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb5-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-17">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb5-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb5-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb5-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-22">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Por <em>default</em>, <code>ggplot</code> utiliza una paleta de colores basados en la función <code>scale_colour_brewer()</code>, con la paleta <code>"Set1"</code>, que es parte de la familia <code>RColorBrewer</code>. Esta paleta se diseña para asegurar que los colores sean fácilmente distinguibles entre sí.</p>
+<p>¿Pero puedo especificar mis propios colores? ¡Claro! Sin embargo, antes de ello, es importante considerar:</p>
+<ol type="1">
+<li><strong>Contraste adecuado</strong>: es importante asegurar que los colores sean lo suficientemente distintos para diferenciar categorías y evitar combinaciones problemáticas para personas con alguna discapacidad visual.</li>
+<li><strong>Consistencia y simplicidad</strong>: se recomienda usar paletas limitadas y coherentes en varios gráficos para evitar sobrecargar la visualización y facilitar la comparación.</li>
+<li><strong>Accesibilidad y legibilidad</strong>: es crucial verificar que los colores no dificulten la lectura de etiquetas o textos, y tengan un buen contraste de fondo.</li>
+<li><strong>Objetivo del gráfico</strong>: elige colores que resalten categorías de interés o sigan el objetivo de la visualización (comparación, descubrimiento, etc.).</li>
+<li><strong>Número de categorías</strong>: si hay muchas categorías, considera otras formas de distinción como facetas o diferentes formas, además de colores.</li>
+</ol>
+<p>Dicho esto, podemos cambiar o personalizar qué colores se asignan a cada continente, utilizando la función <code>scale_color_manual()</code> para establecer los colores en cada nivel de la variable <code>continent</code>. Por ejemplo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb6-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb6-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb6-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_color_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Africa"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, </span>
+<span id="cb6-8">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Asia"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"blue"</span>, </span>
+<span id="cb6-9">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"green"</span>, </span>
+<span id="cb6-10">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Oceania"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"purple"</span>, </span>
+<span id="cb6-11">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Americas"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"orange"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb6-13">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb6-15">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb6-16">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb6-19">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb6-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-22">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb6-23">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb6-24">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-25">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb6-26">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-27">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="agrupación-por-forma" class="level3">
+<h3 class="anchored" data-anchor-id="agrupación-por-forma">Agrupación por forma</h3>
+<p>En algunos otros contextos, puede ser útil emplear una visualización agrupada donde cada categoría se visualice y diferencie en función de la forma de los puntos, y no el color. A pesar de que la lógica es muy similar a la anterior, en estos casos la elección suele radicar en formas de ayuda para evitar la dependencia del color, o simplificación del diseño gráfico (por ejemplo, para publicaciones donde se pide utilizar escalas de color gris).</p>
+<p>¿Cómo hacemos esto en <code>R</code> y a través de <code>ggplot</code>?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb7-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb7-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">shape =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb7-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb7-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb7-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb7-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb7-14">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb7-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-17">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb7-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb7-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb7-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-22">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>El ejemplo, no obstante, hace visible uno de los problemas con este caso. A pesar de que podemos ver algunas formas, como puntos redondos, triángulos, cuadrados, cruces, etc., es evidente que la cantidad de puntos con los que contamos es tal que se vuelve prácticamente inviable distinguir agrupaciones.</p>
+<p>Ahora vamos con las facetas o paneles. Cada grupo va a un panel distinto. Esto permite una comparación más adecuada cuando tenemos un gran <em>overlapping</em> de puntos.</p>
+</section>
+<section id="superposición-de-puntos-y-grupos-paneles" class="level3">
+<h3 class="anchored" data-anchor-id="superposición-de-puntos-y-grupos-paneles">¿Superposición de puntos y grupos? ¡Paneles!</h3>
+<p>En diferentes contextos la distinción de grupos no es suficiente o efectiva bajo la asignación de colores o formas a los puntos. En estos escenarios puede ser frustrante <em>jugar</em> con la transparencia, colores, o formas. ¿Qué hacemos entonces?</p>
+<p>Una solución a esto puede ser la generación de paneles, dividiendo la visualización en subgráficos, lo cual facilita la legibilidad sin sobrecargar un único gráfico. ¿Pero cómo le hacemos? En <code>ggplot</code> esto puede realizarse con la función <code>facet_wrap()</code>, o <code>facet_grid()</code>, aunque esta última no la tocaremos en este blog.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb8-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb8-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb8-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> continent) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb8-9">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb8-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb8-12">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb8-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-16">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb8-17">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-18">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb8-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb8-20">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-21">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb8-22">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-23">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-panels1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Cuando se desea generar un gráfico de dispersión agrupado por una variable (<code>continent</code> para este caso), el uso de <code>facet_wrap()</code> es efectivo. Nuestro ejemplo generó cinco paneles, uno para cada continente dentro de la muestra. Pero, ¿qué es importante considerar antes de generar esta solución?</p>
+<ul>
+<li><strong>Número de paneles</strong>: si tenemos demasiados grupos, el gráfico se vuelve difícil de leer. En este caso, es importante considerar la cantidad de categorías, o hacer una muestra representativa de los datos.</li>
+<li><strong>Etiquetas y títulos</strong>: es importante asegurar que cada panel esté adecuadamente etiquetado, para que sea fácil para el lector, identificar a qué grupo corresponde cada uno.</li>
+</ul>
+</section>
+<section id="extra-extra-gghighlight" class="level3">
+<h3 class="anchored" data-anchor-id="extra-extra-gghighlight">¡Extra, extra! <code>gghighlight()</code></h3>
+<p><code>gghighlight</code> es una herramienta muy valiosa para mejorar la accesibilidad, claridad y efectividad de los gráficos. Esta paquetería, ayuda a simplificar la visualización de datos complejos y permite resaltar patrones o subgrupos de interés de forma clara y atractiva, lo que facilita a los lectores comprender rápidamente la información que se desea transmitir.</p>
+<p>¿Pero qué resaltamos? Siguiendo los ejemplos hasta aquí generados, un posible primer uso de la función <code>gghighlight()</code> podría ser para resaltar, específicamente, los puntos (países) que correspondan al continente europeo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Instalar el paquete gghighlight si no lo tienes</span></span>
+<span id="cb9-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># install.packages("gghighlight")</span></span>
+<span id="cb9-3"></span>
+<span id="cb9-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(gghighlight)</span>
+<span id="cb9-5"></span>
+<span id="cb9-6">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb9-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodgerblue"</span>,</span>
+<span id="cb9-9">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb9-10">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gghighlight</span>(continent <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb9-13">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>, </span>
+<span id="cb9-15">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>, </span>
+<span id="cb9-16">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb9-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb9-20">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb9-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb9-22">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Pero, ¿por qué no contar con lo mejor de ambos mundos? Es decir, ¿podríamos combinar <code>gghighlight()</code> y <code>facet_wrap()</code>? ¡Claro que sí! ¿Cómo?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb10-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gghighlight</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vars</span>(continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb10-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>, </span>
+<span id="cb10-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>, </span>
+<span id="cb10-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb10-14">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb10-15">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb10-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb10-17">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Veamos que, en este caso, contamos con la misma cantidad de paneles que en nuestro ejemplo sobre <code>facet_wrap()</code>, pero ahora, en cada uno de estos no únicamente extraemos los puntos que coinciden con la categoría particular; sino que además, también vemos todos los puntos contenidos en el gráfico conjunto, resaltando simplemente aquellos que <em>caen</em> en cada grupo.</p>
+</section>
+</section>
+<section id="recapitulando" class="level2">
+<h2 class="anchored" data-anchor-id="recapitulando">Recapitulando…</h2>
+<p>La visualización de relaciones bivariadas a través de gráficos de dispersión es una herramienta poderosa para explorar y entender datos, pero su efectividad depende en gran medida de cómo se presenten y ajusten los elementos visuales. En este post, hemos recorrido cómo un gráfico de dispersión simple puede convertirse en una visualización clara y significativa, mediante la adición de elementos como colores, tamaños y etiquetas bien pensadas. El uso de <code>ggplot2</code> en <code>R</code> permite no solo hacer estos ajustes de forma sencilla, sino también ofrecer un control total sobre los detalles del gráfico, lo cual es crucial para asegurar que la historia que queremos contar con nuestros datos se entienda con claridad. Así, la próxima vez que enfrentes un conjunto de datos con relaciones bivariadas, recuerda que un buen gráfico no solo debe ser atractivo, sino también informativo y contextualizado. ¡La clave está en los detalles!</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>ggplot2</category>
+  <category>tidyverse</category>
+  <guid>https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</guid>
+  <pubDate>Wed, 15 Jan 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/banner.png" medium="image" type="image/png" height="96" width="144"/>
+</item>
+</channel>
+</rss>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Pedro I. Rosas-Medina</title>
+<title>Data Blog – Pedro I. Rosas-Medina</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,9 +30,12 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-listing/list.min.js"></script>
+<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
@@ -65,22 +68,82 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
 
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Pedro I. Rosas-Medina">
-<meta property="og:description" content="Análisis de Datos y Ciencia Política">
-<meta property="og:image" content="https://Prosasmed.github.io/mi-webpage/avatar.jpg">
+<link rel="alternate" type="application/rss+xml" title="Pedro I. Rosas-Medina" href="blog.xml" data-external="1"><meta property="og:title" content="Data Blog – Pedro I. Rosas-Medina">
+<meta property="og:image" content="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/banner.png">
 <meta property="og:site_name" content="Pedro I. Rosas-Medina">
 <meta property="og:locale" content="es_MX">
-<meta name="twitter:title" content="Pedro I. Rosas-Medina">
-<meta name="twitter:description" content="Análisis de Datos y Ciencia Política">
-<meta name="twitter:image" content="https://Prosasmed.github.io/mi-webpage/avatar.jpg">
+<meta property="og:image:height" content="2175">
+<meta property="og:image:width" content="3265">
+<meta name="twitter:title" content="Data Blog – Pedro I. Rosas-Medina">
+<meta name="twitter:image" content="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/banner.png">
 <meta name="twitter:creator" content="@Pedro0909">
+<meta name="twitter:image-height" content="2175">
+<meta name="twitter:image-width" content="3265">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -98,7 +161,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Inicio</span></a>
   </li>  
   <li class="nav-item">
@@ -110,7 +173,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Conferencias</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./blog.html"> 
+    <a class="nav-link active" href="./blog.html" aria-current="page"> 
 <span class="menu-text">Blog</span></a>
   </li>  
 </ul>
@@ -121,60 +184,86 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Z2dwbG90Mg==">ggplot2 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGlkeXZlcnNl">tidyverse <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
-<div class="quarto-about-trestles page-columns page-full">
-  <div class="about-entity">
-    <img src="avatar.jpg" class="about-image
-  rounded " style="width: 20em;">
+<main class="content page-columns page-full column-body" id="quarto-document-content">
+
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Pedro I. Rosas-Medina</h1>
+<h1 class="title">Data Blog</h1>
 </div>
-<div class="quarto-title-meta">
+
+
+
+<div class="quarto-title-meta column-body">
+
+    
+  
+    
   </div>
+  
+
+
 </header>
-    <div class="about-links">
-  <a href="https://www.linkedin.com/in/pedro-rosas/" class="about-link" rel="" target="">
-    <i class="bi bi-linkedin"></i>
-     <span class="about-link-text">LinkedIn</span>
-  </a>
-  <a href="https://github.com/Prosasmed" class="about-link" rel="" target="">
-    <i class="bi bi-github"></i>
-     <span class="about-link-text">GitHub</span>
-  </a>
-  <a href="mailto:prosasmed@gmail.com" class="about-link" rel="" target="">
-    <i class="bi bi-inbox"></i>
-     <span class="about-link-text">Email</span>
-  </a>
-  <a href="/blog.html" class="about-link" rel="" target="">
-    <i class="bi bi-rss"></i>
-     <span class="about-link-text">Blog</span>
-  </a>
-  <a href="/cv.pdf" class="about-link" rel="" target="">
-     <span class="about-link-text">CV</span>
-  </a>
-  <a href="https://x.com/Pedro0909" class="about-link" rel="" target="">
-    <i class="bi bi-twitter-x"></i>
-     <span class="about-link-text"></span>
-  </a>
-</div>
-  </div>
-  <div class="about-contents page-columns page-full"><main class="content page-columns page-full" id="quarto-document-content">
-<section id="bio" class="level2 column-page">
-<h2 data-anchor-id="bio">Bio</h2>
-<p>Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la <a href="https://www.flacso.edu.mx">FLACSO México</a>. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el <a href="https://github.com/Prosasmed/tesis_flacso.git">financiamiento público de la educación en países en vías de desarrollo</a>, y la <a href="https://github.com/Prosasmed/gasto_eduprivado_M-xico.git">inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares</a>; así como en la gestión, análisis y visualización de datos cuantitativos (empleando <a href="blog.html">lenguaje R, tidyverse, o ggplot2</a> y <a href="https://prosasmed.github.io/usaer_dashboard/">herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks</a>.</p>
-<p>Por formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.</p>
-<p>En este sitio comparto fundamentalmente <a href="papers">mis proyectos de investigación</a>, <a href="talks">conferencias</a>, <a href="teaching">proyectos de enseñanza</a>, y <a href="cv.pdf">mi CV</a>, así como un <a href="blog.html">blog técnico</a> donde comparto RCode.</p>
-</section>
 
 
-</main></div>
+<div class="column-page">
+
 </div>
- <!-- /main -->
+
+
+
+
+<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-categories="UiUyQ2dncGxvdDIlMkN0aWR5dmVyc2U=" data-listing-date-sort="1736899200000" data-listing-file-modified-sort="1737488839572" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="23" data-listing-word-count-sort="4429">
+<div class="thumbnail">
+<p><a href="./posts/2025_FirstBlogPost/index.html" class="no-external"></a></p><a href="./posts/2025_FirstBlogPost/index.html" class="no-external">
+<p><img loading="lazy" src="./posts/2025_FirstBlogPost/banner.png" class="thumbnail-image"></p>
+</a><p><a href="./posts/2025_FirstBlogPost/index.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/2025_FirstBlogPost/index.html" class="no-external">Visualización de relaciones bivariadas</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/2025_FirstBlogPost/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">
+R
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Z2dwbG90Mg=='); return false;">
+ggplot2
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('dGlkeXZlcnNl'); return false;">
+tidyverse
+</div>
+</div>
+<div class="listing-description">
+<a href="./posts/2025_FirstBlogPost/index.html" class="no-external">Análisis gráfico a través de scatterplots, o gráficos de dispersión elaborados mediante ggplot2 en R</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/2025_FirstBlogPost/index.html" class="no-external">
+<div class="listing-date">
+Jan 15, 2025
+</div>
+<div class="listing-author">
+Pedro I. Rosas-Medina
+</div>
+</a>
+</div>
+</div>
+</div>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -195,6 +284,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
   const isCodeAnnotation = (el) => {
     for (const clz of el.classList) {
       if (clz.startsWith('code-annotation-')) {                     
