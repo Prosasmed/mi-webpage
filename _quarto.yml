@@ -1,6 +1,7 @@
 project:
   type: website
   resources:
+    - _headers
     - cv.pdf
 
 website:
@@ -37,14 +38,17 @@ website:
 
 format:
   html:
-    theme: [sandstone, _variables.scss]
+    theme:
+      - assets/stylesheets/coeos.scss
+      - assets/stylesheets/projects.scss
     css: styles.css
-    toc: false
+    highlight-style: github-dark
     code-copy: TRUE
     code-link: TRUE
     anchor-sections: TRUE
     email-obfuscation: javascript
     link-external-newwindow: TRUE
+    fig-align: center
 
 lightbox: auto
 

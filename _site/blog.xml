@@ -465,7 +465,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/marginal-plot3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -491,7 +491,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 </section>
 </section>
 
- ]]></description>
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a> ]]></description>
   <category>R</category>
   <category>Econometrics</category>
   <category>tidyverse</category>

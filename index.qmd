@@ -1,17 +1,18 @@
 ---
 title: "Pedro I. Rosas-Medina"
+subtitle : |
+  PhD Candidate, politólogo, y analista de datos.
 image: avatar.jpg
 about:
-  template: trestles
+  template: solana
+  image-width: 9em
+  image-shape: round
   links:
-    - text: LinkedIn
-      icon: linkedin
+    - icon: linkedin
       url: "https://www.linkedin.com/in/pedro-rosas/"
-    - text: GitHub
-      icon: github
+    - icon: github
       url: "https://github.com/Prosasmed"
-    - text: Email
-      icon: inbox
+    - icon: inbox
       url: "mailto:prosasmed@gmail.com"
     - text: CV
       url: "cv.pdf"
@@ -19,9 +20,9 @@ about:
       url: "https://x.com/Pedro0909"
 comments: FALSE
 ---
-::: {.column-page}
 
-## Bio
+::: {#edu-exp}
+:::
 
 Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la [FLACSO México](https://www.flacso.edu.mx). Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente 
 (el [financiamiento público de la educación en países en vías de desarrollo](https://github.com/Prosasmed/tesis_flacso.git), y la 
@@ -32,4 +33,32 @@ Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política p
 Por formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.
 
 En este sitio comparto fundamentalmente [mis proyectos de investigación](papers), [conferencias](talks), [proyectos de enseñanza](teaching), y [mi CV](cv.pdf), así como un [blog técnico](blog.html) donde comparto RCode.
+
+:::: {.grid}
+::: {.g-col-12 .g-col-md-8 style="text-align: left;"}
+## Educación
+
+- **_Ph.D. Candidate_ Social Sciences** (*Especialización en Ciencia Política*), **2025**  
+  *FLACSO, México*
+
+- **_Maestro_ en Gobierno y Asuntos Públicos**, **2022**  
+  *FLACSO, México*
+
+- **_Licenciado_ en Políticas Públicas**, **2018**  
+  *UAM, México*
 :::
+
+::: {.g-col-12 .g-col-md-4 style="text-align: left;"}
+## Intereses
+
+- Ciencia Política
+- Econometría
+- Análisis cuantitativo
+- Análisis de datos
+- Visualización de datos
+- Panel data
+- R code
+- Quarto
+:::
+
+::::
