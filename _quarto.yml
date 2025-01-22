@@ -6,10 +6,15 @@ project:
 website:
   title: "Pedro I. Rosas-Medina"
   description: "Análisis de Datos y Ciencia Política"
+  site-url: https://prosasmed.github.io/mi-webpage/
+  repo-url: https://github.com/Prosasmed/mi-webpage.git
+  repo-actions: [issue]
   open-graph:
     locale: es_MX
   twitter-card:
     creator: "@Pedro0909"
+  page-navigation: TRUE
+  back-to-top-navigation: TRUE
   navbar:
     right:
       - href: index.qmd
@@ -24,8 +29,10 @@ website:
     border: true
     left: |
       Powered by [{{< iconify simple-icons:quarto >}} Quarto](https://quarto.org).
+    center: |
+      Pedro I. Rosas-Medina
     right: |
-      Pedro I. Rosas-Medina 2025.
+      Repo [{{< iconify simple-icons:github >}} GitHub](https://github.com/Prosasmed/mi-webpage.git).
       
 
 format:
@@ -33,6 +40,13 @@ format:
     theme: [sandstone, _variables.scss]
     css: styles.css
     toc: false
+    code-copy: TRUE
+    code-link: TRUE
+    anchor-sections: TRUE
+    email-obfuscation: javascript
+    link-external-newwindow: TRUE
+
+lightbox: auto
 
 
 

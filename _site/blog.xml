@@ -1,0 +1,2943 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Pedro I. Rosas-Medina</title>
+<link>https://prosasmed.github.io/mi-webpage/blog.html</link>
+<atom:link href="https://prosasmed.github.io/mi-webpage/blog.xml" rel="self" type="application/rss+xml"/>
+<description>Análisis de Datos y Ciencia Política</description>
+<generator>quarto-1.6.40</generator>
+<lastBuildDate>Mon, 20 Jan 2025 06:00:00 GMT</lastBuildDate>
+<item>
+  <title>Efectos marginales condicionales</title>
+  <dc:creator>Pedro I. Rosas-Medina</dc:creator>
+  <link>https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Antes de que todo lo tuviéramos en nuestros celulares, las fotos las imprimíamos, y las colocábamos en álbumes. ¿Alguna vez viste alguno? Muchas veces, estos <em>libros</em> contaban con páginas y páginas de fotos familiares, donde generalmente aparecían las mismas personas en un mismo lugar: la casa de los abuelos, o el jardín donde la familia jugaba..</p>
+<p>Imagina que estás viendo un álbum de fotos, donde el fondo de cada una de estas es siempre el mismo, pero las personas cambian: crecen, se mudan, cambian de peinado, o incluso de estilo. ¿Cómo podrías analizar estos cambios en tu familia, sin distraerte con el fondo o la decoración propia de la casa donde se tomó la foto? Una forma sería ignorar estos <em>elementos fijos</em>, enfocándote únicamente en las <em>diferencias de un año a otro</em>.</p>
+<p>Pues bien, ¡eso es más o menos lo que hacen los modelos de efectos fijos! En lugar de intentar captar todo, estos modelos “ignoran” las cosas que no cambian con el tiempo (como el fondo en las fotos) y se centran en los cambios dentro de cada grupo o unidad (las personas en las fotos). Esto los convierte en una herramienta fantástica para responder preguntas como: <em>¿Qué pasa cuando una política cambia en un país?</em> o <em>¿Cómo afecta un cambio de estrategia en una empresa a sus resultados?</em></p>
+<p>En esta publicación, no me interesa demasiado explicar la lógica detrás de un modelo de efectos fijos, o los tipos de estos. Joshua D. Angrist &amp; Jörn-Steffen Pischke, por ejemplo, brindan una excelente explicación al respecto en su libro <a href="https://www.mostlyharmlesseconometrics.com">Mostly Harmless Econometrics</a>; mientras que Arne Henningsen &amp; Géraldine Henningsen, en su capítulo <a href="https://www.sciencedirect.com/science/article/abs/pii/B9780128143674000125">Analysis of Panel Data Using R</a>, ofrecen una explicación detallada de este tipo de modelación a través de <code>R</code>.</p>
+<p>En cambio, aquí explicaré un ejemplo que, personalmente, me causó demasiados problemas en mi tesis doctoral: la visualización de efectos marginales condicionales promedio, derivado de estmaciones de modelos de efectos fijos de dos vías.</p>
+<section id="el-caso" class="level2">
+<h2 class="anchored" data-anchor-id="el-caso">El caso…</h2>
+<p>En mi tesis doctoral construí diferentes modelos de efectos fijos de dos vías con el objetivo de entender las razones por las cuales, en Latinoamérica, los países de la región expandieron los niveles de financiamiento público educativo a partir de la década de los 90; y priorizaron sistemáticamente el gasto entre niveles parte de los subsistemas de enseñanza básica, respecto a la educación superior, o profesional.</p>
+<p>Evidentemente, el caso es mucho más amplio, y en este <em>post</em> no quisiera adentrar sobre el <em>por qué</em> de cada covariante incluida en los modelos. Sin embargo, es preciso mencionar <em>por qué</em> un modelo de efectos fijos.</p>
+<section id="two-way-fixed-effects-models" class="level3">
+<h3 class="anchored" data-anchor-id="two-way-fixed-effects-models">Two-way Fixed Effects Models</h3>
+<p>Uno usa modelos de efectos fijos de dos vías cuando lo que intentas es controlar la heterogeneidad no observada que es constante en el tiempo para cada unidad transversal (en español: países, individuos, o incluso empresas), y simultáneamente por factores inobservables que son constantes a través de las unidades en un periodo específico (otra vez, en español: el tiempo).</p>
+<p>¿Pero cuándo es útil este análisis de datos tipo panel?</p>
+<ol type="1">
+<li>Cuando <strong>existen efectos específicos de las unidades</strong>: cuando quieran capturar características inherentes a las unidades (como diferencias culturales, políticas, o estructurales entre países) que no varían en el tiempo.</li>
+<li>Cuando <strong>existen efectos específicos del tiempo</strong>: es decir, cuando quieran modelar influencias comunes a todas las unidades en un momento dado, como <em>shocks</em> macroeconómicos globales, o eventos específicos de un periodo.</li>
+<li>Cuando <strong>la variación dentro de las unidades y a través del tiempo es clave</strong>: es decir, cuando el interés recaiga en identificar relaciones causales utilizando la variación interna de las unidades, descontando los efectos constantes de las unidades y del tiempo.</li>
+</ol>
+</section>
+<section id="la-base-de-datos" class="level3">
+<h3 class="anchored" data-anchor-id="la-base-de-datos">La base de datos</h3>
+<p>La base de datos que emplearemos en este ejemplo es de elaboración propia, y pueden encontrarla en mi <a href="https://github.com/Prosasmed/tesis_flacso.git">Github</a>. En términos generales, este marco de datos es de tipo panel, y cuenta con mucha información sobre educación, economía, contexto político y social de <img src="https://latex.codecogs.com/png.latex?18"> países latinoamericanos, entre <img src="https://latex.codecogs.com/png.latex?1970"> y <img src="https://latex.codecogs.com/png.latex?2018">. Sobre fuentes de información y demás, una vez más, los invito a que revisen el repositorio, pues ahí tienen todo lo necesario… Sin embargo, quedémonos con esta puntualización para el ejemplo que elaboraremos en este <em>post</em>:</p>
+<ul>
+<li><strong>Variable dependiente</strong>: gasto público educativo de cada gobierno latinoamericano incluido en la muestra, entre 1970 y 2018, como proporción del PIB.</li>
+<li><strong>Variables independientes</strong>:
+<ul>
+<li><em>Ideología gubernamental</em>: variable continua con puntajes de ideología gubernamental, entre una escala restringida entre <img src="https://latex.codecogs.com/png.latex?1"> y <img src="https://latex.codecogs.com/png.latex?20">, donde los extremos representan posiciones ideológicas extremas (izquierda y derecha, respectivamente).</li>
+<li><em>Globalizacón</em>: nivel de globalización del país para el año observado. Promedio entre <img src="https://latex.codecogs.com/png.latex?0"> y <img src="https://latex.codecogs.com/png.latex?100">, donde los extremos representan el nivel de apertura a los mercados internacionales de bienes y servicios (sin globalización y completamente globalizado, respectivamente).</li>
+</ul></li>
+<li><strong>Variables de control</strong>: conjunto de variables de control que definen características sociales y económicas de los gobiernos latinoamericanos para el periodo observado.</li>
+</ul>
+</section>
+<section id="estimación" class="level3">
+<h3 class="anchored" data-anchor-id="estimación">Estimación</h3>
+<p>La estimación de un modelo de efectos fijos de dos vías en <code>R</code>, generalmente sigue la función <code>plm()</code>, de la paquetería <code>plm</code>. El modelo busca evaluar cómo varias variables explicativas impactan en la variable dependiente <code>exp_w1</code>, controlando por heterogeneidad no observada específica de las unidades (en este caso, países) y de los periodos (aquí: años).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">h1_tw2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plm</span>(exp_w1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> VP_mean <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> KOFGIdj <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> VP_mean <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> KOFGIdj <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb1-2">                pop_w2 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> pop_w1_ln <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> eco_w4 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> eco_w6 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> eco_w16,</span>
+<span id="cb1-3">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> h1,</span>
+<span id="cb1-4">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">model =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"within"</span>,</span>
+<span id="cb1-5">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">effect =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"twoways"</span>)</span></code></pre></div>
+</div>
+<p>Desglosemos lo anterior:</p>
+<ol type="1">
+<li>La función <code>plm()</code> estima modelos para datos tipo panel:</li>
+</ol>
+<ul>
+<li>La fórmula <code>exp_w1 ~ ...</code> nos dice que:
+<ul>
+<li><code>exp_w1</code> es la variable dependiente,</li>
+<li><code>VP_mean</code> y <code>KOFGIdj</code> son las variables explicativas principales.</li>
+<li><code>VP_mean * KOFGIdj</code> es el término de interacción para analizar si el efecto de la polarización política depende del nivel de globalización.</li>
+<li><code>pop_w2</code>, <code>pop_w1_ln</code>, <code>eco_w4</code>, <code>eco_w6</code>, <code>eco_w16</code> son las variables de control relacionadas a población y economía de los países.</li>
+</ul></li>
+<li><code>data = h1</code> es la base de datos que contiene las variables.</li>
+<li><code>model = "within"</code> especifica un modelo de efectos fijos, que elimina la heterogeneidad no observada constante para cada unidad y cada periodo.</li>
+<li><code>effect = "twoways"</code> indica un modelo de efectos fijos de dos vías, controlando por efectos específicos de las unidades y periodos.</li>
+</ul>
+<p>Ahora podemos ver los resultados:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(h1_tw2)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Twoways effects Within Model
+
+Call:
+plm(formula = exp_w1 ~ VP_mean + KOFGIdj + VP_mean * KOFGIdj + 
+    pop_w2 + pop_w1_ln + eco_w4 + eco_w6 + eco_w16, data = h1, 
+    effect = "twoways", model = "within")
+
+Unbalanced Panel: n = 17, T = 10-27, N = 342
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-2.311338 -0.333117  0.037205  0.369118  2.590839 
+
+Coefficients:
+                   Estimate  Std. Error t-value  Pr(&gt;|t|)    
+VP_mean          0.37518739  0.09064829  4.1389 4.639e-05 ***
+KOFGIdj          0.11489022  0.02568127  4.4737 1.125e-05 ***
+pop_w2           0.11828132  0.05723363  2.0666   0.03970 *  
+pop_w1_ln        0.07380443  1.10280716  0.0669   0.94669    
+eco_w4          -0.00013629  0.00005570 -2.4468   0.01504 *  
+eco_w6          -0.03721986  0.01604994 -2.3190   0.02113 *  
+eco_w16          0.02632195  0.02207769  1.1922   0.23419    
+VP_mean:KOFGIdj -0.00569599  0.00135620 -4.2000 3.606e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    137.91
+Residual Sum of Squares: 123.21
+R-Squared:      0.10659
+Adj. R-Squared: -0.10381
+F-statistic: 4.1163 on 8 and 276 DF, p-value: 0.00011713</code></pre>
+</div>
+</div>
+<p>Antes de seguir, interpretemos rápidamente lo encontrado:</p>
+<ul>
+<li><strong><code>VP_mean</code> (polarización ideológica)</strong>: Un aumento en la polarización incrementa significativamente el gasto educativo (coeficiente <img src="https://latex.codecogs.com/png.latex?=%200.375,%20p%20%3C%200.001">).</li>
+<li><strong><code>KOFGIdj</code> (globalización)</strong>: La globalización también tiene un efecto positivo y significativo sobre el gasto educativo (coeficiente <img src="https://latex.codecogs.com/png.latex?=%200.115,%20p%20%3C%200.001">).</li>
+<li><strong>Interacción <code>VP_mean:KOFGIdj</code></strong>: El coeficiente de <img src="https://latex.codecogs.com/png.latex?-0.0057%20(p%20%3C%200.001)"> indica que el efecto positivo de la polarización disminuye a medida que aumenta el grado de globalización.</li>
+<li>El <strong>R-cuadrado</strong> (<img src="https://latex.codecogs.com/png.latex?0.107">) indica que el modelo explica aproximadamente el <img src="https://latex.codecogs.com/png.latex?10.7%5C%25"> de la variación en el gasto educativo. Este nivel de ajuste es común en modelos de datos panel con efectos fijos, donde gran parte de la variación ya está controlada por efectos no observados.</li>
+<li>Por tanto, la polarización ideológica y la globalización tienen efectos significativos sobre el gasto educativo público. Sin embargo, la interacción negativa entre ambas variables sugiere que la globalización modera el impacto de la polarización, disminuyendo su efecto positivo a medida que los niveles de globalización aumentan.</li>
+</ul>
+<p>Con el objetivo de garantizar que los errores estándar reportados sean <strong>robustos a la heterocedasticidad</strong>, a continuación, se calculan estos a través de la función <code>coeftest()</code>. Este paso es <strong>fundamental</strong> en el análisis de datos tipo panel, donde la varianza de los errores puede no ser constante entre observaciones, lo que podría sesgar las inferencias estadísticas si no se corrige.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coeftest</span>(h1_tw2, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vcov =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vcovHC</span>(h1_tw2, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"HC1"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+t test of coefficients:
+
+                   Estimate  Std. Error t value Pr(&gt;|t|)  
+VP_mean          0.37518739  0.17180062  2.1839  0.02981 *
+KOFGIdj          0.11489022  0.04793220  2.3969  0.01720 *
+pop_w2           0.11828132  0.11752730  1.0064  0.31510  
+pop_w1_ln        0.07380443  3.17545949  0.0232  0.98147  
+eco_w4          -0.00013629  0.00013802 -0.9874  0.32430  
+eco_w6          -0.03721986  0.02317632 -1.6059  0.10943  
+eco_w16          0.02632195  0.04029425  0.6532  0.51414  
+VP_mean:KOFGIdj -0.00569599  0.00272008 -2.0940  0.03717 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="y-ahora-grafiquemos-resultados" class="level3">
+<h3 class="anchored" data-anchor-id="y-ahora-grafiquemos-resultados">¿Y ahora? Grafiquemos resultados</h3>
+<p>¡Ya… casi! Ahora vamos con el propósito de este <em>post</em>: el análisis de efectos marginales condicionales para ilustrar la forma en que el efecto de la ideología <code>VP_mean</code>, varía sobre el gasto educativo <code>exp_w1</code>, según el nivel de globalización <code>KOFGIdj</code>. A continuación, desglosaré qué es este tipo de análisis visual, y cómo se construye en <code>R</code> a través del ejemplo en cuestión.</p>
+</section>
+</section>
+<section id="efectos-marginales-condicionales" class="level2">
+<h2 class="anchored" data-anchor-id="efectos-marginales-condicionales">Efectos marginales condicionales</h2>
+<p>En ciencias sociales, y fundamentalmente, en ciencia política, la mayoría de argumentos teóricos postulan que el efecto de ciertas variables varía dependiendo del contexto social, político, económico, o estratégico… Por tanto, encontrar modelos econométricos como el de este ejemplo, donde se postula una interacción entre variables, es algo muy usual en la vida real. Pero, ¿qué quiero decir con esto?</p>
+<p>El ejemplo de este <em>post</em> aborda una hipótesis condicional que sigue una estructura estándar en la literatura sobre efectos marginales condicionales. Específicamente, se plantea que la <strong>posición ideológica gubernamental</strong> (<img src="https://latex.codecogs.com/png.latex?X">) tiene un efecto positivo sobre el <strong>gasto público educativo</strong> (<img src="https://latex.codecogs.com/png.latex?Y">), cuyo impacto se ve amplificado a medida que <strong>la globalización</strong> (<img src="https://latex.codecogs.com/png.latex?Z">) aumenta. Formalmente, la hipótesis puede expresarse como una interacción entre <img src="https://latex.codecogs.com/png.latex?X"> y <img src="https://latex.codecogs.com/png.latex?Z">, donde el efecto de <img src="https://latex.codecogs.com/png.latex?X"> sobre <img src="https://latex.codecogs.com/png.latex?Y"> depende del valor de <img src="https://latex.codecogs.com/png.latex?Z">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Bequation%7D%0AY_%7Bit%7D%20=%20%5Cbeta_0%20+%20%5Cbeta_1%20X_%7Bit%7D%20+%20%5Cbeta_2%20Z_t%20+%20%5Cbeta_3%20(X_%7Bit%7D%20%5Ctimes%20Z_%7Bit%7D)%20+%20%5Calpha_i%20+%20%5Clambda_t%20+%20%5Cepsilon_%7Bit%7D%0A%5Cend%7Bequation%7D"></p>
+<p>Donde:</p>
+<ul>
+<li><strong><img src="https://latex.codecogs.com/png.latex?Y_%7Bit%7D"></strong>: Gasto público educativo de país <img src="https://latex.codecogs.com/png.latex?i"> en el tiempo <img src="https://latex.codecogs.com/png.latex?t">.</li>
+<li><strong><img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D"></strong>: Posición ideológica del gobierno del país <img src="https://latex.codecogs.com/png.latex?i"> en el tiempo <img src="https://latex.codecogs.com/png.latex?t">.</li>
+<li><strong><img src="https://latex.codecogs.com/png.latex?Z_%7Bit%7D"></strong>: Nivel de globalización en el tiempo <img src="https://latex.codecogs.com/png.latex?t">.</li>
+<li><strong><img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D%20%5Ctimes%20Z_%7Bit%7D"></strong>: Término de interacción entre la ideología del gobierno y la globalización.</li>
+<li><strong><img src="https://latex.codecogs.com/png.latex?%5Calpha_i"></strong>: Efectos fijos por unidad (por ejemplo, país).</li>
+<li><strong><img src="https://latex.codecogs.com/png.latex?%5Clambda_t"></strong>: Efectos fijos por tiempo (por ejemplo, año).</li>
+<li><strong><img src="https://latex.codecogs.com/png.latex?%5Cepsilon_%7Bit%7D"></strong>: Error aleatorio.</li>
+</ul>
+<p>Pero, <strong>¿qué es el efecto marginal condicional?</strong> Este concepto refiere a la variación en la expectativa de la variable dependiente ante un cambio en una variable independiente, condicionado a un valor específico de otra variable, que puede estar involucrada en una interacción, o estar controlada por otros factores. El concepto, por tanto, permite entender cómo cambia la relación entre las variables frente a diferentes contextos, proporcionando una interpretación más precisa sobre las dinámicas subyacentes del modelo. ¿Y cómo lo obtenemos?</p>
+<p>Para el modelo en cuestión, el efecto marginal de <img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D">, está dado por</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Bequation%7D%0A%5Cfrac%7B%5Cpartial%20Y_%7Bit%7D%7D%7B%5Cpartial%20X_%7Bit%7D%7D%20=%20%5Cbeta_1%20X_%7Bit%7D%20+%20%5Cbeta_3%20Z.%0A%5Cend%7Bequation%7D"></p>
+<p>Por tanto, a menos que el coeficiente asociado al producto (<img src="https://latex.codecogs.com/png.latex?%5Cbeta_%7B3%7D">) sea igual a <img src="https://latex.codecogs.com/png.latex?0">, el efecto marginal de <img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D"> es condicional al valor de <img src="https://latex.codecogs.com/png.latex?Z_%7Bit%7D">.</p>
+<p>En resumen: la interacción entre las variables de ideología gubernamental y globalización implica que el efecto de la posición ideológica gubernamental sobre el gasto público educativo no es constante, sino que depende del punto de apertura comercial a los mercados internacionales de bienes y servicios en el que se encuentre cada gobierno en un periodo específico. En otras palabras, el impacto de la ideología sobre el gasto se intensifica o atenúa según el contexto global en el que se encuentre el país.</p>
+<p>Este tipo de interacción es crucial para obtener una comprensión más completa de las relaciones entre variables en contextos dinámicos. Así, el efecto marginal condicional nos permitirá observar cómo cambia el impacto de una variable en función de otra, proporcionando una perspectiva más detallada sobre cómo las variables actúan conjuntamente dentro de un marco empírico como el que estamos analizando en este ejemplo.</p>
+<section id="gráficos-de-efectos-marginales-condicionales" class="level3">
+<h3 class="anchored" data-anchor-id="gráficos-de-efectos-marginales-condicionales">Gráficos de efectos marginales condicionales</h3>
+<p>Antes de iniciar a construir el <code>ggplot</code> del gráfico de efectos marginales condicionales, lo primero que haremos es generar un vector de valores numéricos entre <img src="https://latex.codecogs.com/png.latex?0"> y <img src="https://latex.codecogs.com/png.latex?100">, con el objetivo de forzar el cálculo de los efectos marginales condicionales sobre todo el rango posible de valores que puede tener la variable condicionand (<img src="https://latex.codecogs.com/png.latex?Z">).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">koffgi_values <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.20</span>)</span></code></pre></div>
+</div>
+<p>Con base en esto, ahora calcularemos los efectos marginales condicionales promedio para los valores específicos de <img src="https://latex.codecogs.com/png.latex?Z">. Para ello, utilizaremos la función <code>avg_slopes()</code> de la paquetería <code>marginaleffects</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(marginaleffects)</span>
+<span id="cb7-2">c_me_unobserved_avg <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> marginaleffects<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">avg_slopes</span>(</span>
+<span id="cb7-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">model =</span> h1_tw2,</span>
+<span id="cb7-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">datagrid</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">KOFGIdj =</span> koffgi_values),</span>
+<span id="cb7-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">variables =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"VP_mean"</span>,</span>
+<span id="cb7-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"KOFGIdj"</span>,</span>
+<span id="cb7-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">conf_level =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.90</span></span>
+<span id="cb7-8">)</span></code></pre></div>
+</div>
+<p>¿Qué hicimos?</p>
+<ul>
+<li><code>model = h1_tw2</code> es el modelo previamente ajustado con la función <code>plm()</code>, en el que se estimaron los efectos fijos de dos vías para el gasto público educativo, la ideología y la globalización.</li>
+<li><code>newdata = datagrid(KOFGIdj = koffgi_values)</code>: Esta línea define un conjunto de datos simulado con diferentes valores de la variable <code>KOFGIdj</code> (nivel de globalización). Este nuevo conjunto de datos se utiliza para evaluar cómo cambia el efecto de <code>VP_mean</code> (ideología gubernamental) en función de los valores de <code>KOFGIdj</code>.</li>
+<li><code>variables = "VP_mean"</code>: Especifica que los efectos marginales deben calcularse para la variable <code>VP_mean</code>, que es la posición ideológica del gobierno.</li>
+<li><code>by = "KOFGIdj"</code>: Indica que los efectos marginales de <code>VP_mean</code> deben calcularse para cada nivel de <code>KOFGIdj</code> (globalización), es decir, el cálculo se realiza de forma condicionada a los valores de esta variable.</li>
+<li><code>conf_level = 0.90</code>: Establece el nivel de confianza para los intervalos de confianza calculados, en este caso, un intervalo de confianza del <img src="https://latex.codecogs.com/png.latex?90%5C%25">.</li>
+</ul>
+<p>Ahora sí, veamos nuestro gráfico de efectos marginales condicionales promedio:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">c_me_unobserved_avg <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> KOFGIdj, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> estimate)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yintercept =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.00</span>,</span>
+<span id="cb8-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dashed"</span>,</span>
+<span id="cb8-5">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grey25"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodgerblue2"</span>,</span>
+<span id="cb8-7">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.9</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_ribbon</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> conf.low, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> conf.high),</span>
+<span id="cb8-9">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>,</span>
+<span id="cb8-10">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-11">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dotdash"</span>,</span>
+<span id="cb8-12">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgrey"</span>,</span>
+<span id="cb8-13">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linewidth =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Efectos marginales condicionales"</span>,</span>
+<span id="cb8-15">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Ideología, Globalización y Gasto Público Educativo"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Nivel de globalización"</span>,</span>
+<span id="cb8-17">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Efecto de la ideología"</span>,</span>
+<span id="cb8-18">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con datos del Banco Mundial"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x.font.size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,</span>
+<span id="cb8-20">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y.font.size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-21">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb8-22">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text.x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-23">                                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>),</span>
+<span id="cb8-24">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text.y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-25">                                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>),</span>
+<span id="cb8-26">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Pero, ¿qué con esto? El gráfico nos dice mucho, pero vamos por partes.</p>
+<p>En general, <strong>el gráfico devela una pendiente negativa debido al coeficiente</strong> <img src="https://latex.codecogs.com/png.latex?%5Cbeta_%7B3%7D"> encontrado bajo la condición de interacción. De esto se deduce que:</p>
+<ol type="1">
+<li>Cuando los países de la región se encuentran bajo condiciones económicas de completo cierre a los mercados internacionales de bienes y servicios, el efecto marginal de un movimiento ideológico gubernamental en una unidad hacia la derecha (más conservadores), se asociaría con un incremento significativo de <img src="https://latex.codecogs.com/png.latex?0.38"> puntos porcentuales sobre el financiamiento público del sector.</li>
+</ol>
+<p>Sin embargo, esto no es todo. ¿Qué más podemos inferir?</p>
+<ol start="2" type="1">
+<li>Cuanto más globalizado se encuentra un país, la relación observada tendería a decrecer en magnitud. Es decir: una vez que los países se globalizan por encima del <img src="https://latex.codecogs.com/png.latex?65.86%5C%25">, la promoción de políticas con un impacto superior sobre el fenómeno resultaría en retracciones bajo gobiernos ideológicamente de derecha, y el gasto educativo público total, o agregado.</li>
+</ol>
+<p>Si… ¿pero qué hay de la línea punteada horizontal en <img src="https://latex.codecogs.com/png.latex?0">?</p>
+<p>El punto anterior nos da una pista. Hay un punto, específicamente en <img src="https://latex.codecogs.com/png.latex?65.86%5C%25"> de globalización, donde el efecto marginal de <img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D"> (ideología) sobre <img src="https://latex.codecogs.com/png.latex?Y_%7Bit%7D"> (gasto educativo) es neutro… por eso la línea punteada horizontal en <img src="https://latex.codecogs.com/png.latex?0">: pues es aquí donde el efecto, valga la redundancia, es <strong>nulo</strong>. ¿Y cómo se obtiene? Recordemos: el efecto marginal condicional (<img src="https://latex.codecogs.com/png.latex?ME">) de <img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D"> sobre <img src="https://latex.codecogs.com/png.latex?Y_%7Bit%7D"> dado <img src="https://latex.codecogs.com/png.latex?Z_%7Bit%7D"> está dado por:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Bequation%7D%0AME(X_%7Bit%7D%20%5Cmid%20Z_%7Bit%7D)%20=%20%5Cfrac%7B%5Cpartial%20Y_%7Bit%7D%7D%7B%5Cpartial%20X_%7Bit%7D%7D%20=%20%5Cbeta_1%20X_%7Bit%7D%20+%20%5Cbeta_3%20Z.%0A%5Cend%7Bequation%7D"></p>
+<p>Por tanto, el punto donde <img src="https://latex.codecogs.com/png.latex?ME(X_%7Bit%7D%20%5Cmid%20Z_%7Bit%7D)%20=%200">, se encuentra resolviendo la derivada parcial de <img src="https://latex.codecogs.com/png.latex?X_%7Bit%7D"> dado <img src="https://latex.codecogs.com/png.latex?Z_%7Bit%7D">, es decir:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Bequation%7D%0A%5Cbeta_1%20X_%7Bit%7D%20+%20%5Cbeta_3%20Z_%7Bit%7D%20=%200%0A%5Cend%7Bequation%7D"></p>
+<p>Entonces, tenemos que para <img src="https://latex.codecogs.com/png.latex?Z_%7Bit%7D"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Balign%7D%0AZ_%7Bit%7D%20&amp;=%20-%5Cfrac%7B%5Cbeta_%7B1%7D%20X_%7Bit%7D%7D%7B%5Cbeta_%7B3%7D%20Z_%7Bit%7D%7D,%5C%5C%0A-%5Cfrac%7B0.37518739%7D%7B-0.00569599%7D%20=%2065.86%0A%5Cend%7Balign%7D"></p>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>Econometrics</category>
+  <category>tidyverse</category>
+  <category>ggplot2</category>
+  <guid>https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/</guid>
+  <pubDate>Mon, 20 Jan 2025 06:00:00 GMT</pubDate>
+  <media:content url="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/banner.png" medium="image" type="image/png" height="80" width="144"/>
+</item>
+<item>
+  <title>Trabajo visual en modelos econométricos</title>
+  <dc:creator>Pedro I. Rosas-Medina</dc:creator>
+  <link>https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>La visualización de datos no únicamente es generar figuras que desplieguen números brutos de un tabulado, o marco de datos. La visualización implica resumir o transformar partes de estos conjuntos de información, y luego graficar los resultados. Los modelos econométricos forman una parte central de este proceso.</p>
+<p>Por ejemplo, a partir de una misma relación entre el PIB per cápita, y la expectativa de vida, podemos contar con diferentes modelos cuyos resultados, nos llevarían a gráficos diferentes. En este gráfico, contamos con líneas de ajuste para una regresión robusta, <em>splines</em> cúbicos, y una regresión cuantílica suavizada.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/bestfit-regressions1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="mirando-dentro-de-modelos-econométricos" class="level2">
+<h2 class="anchored" data-anchor-id="mirando-dentro-de-modelos-econométricos">Mirando dentro de modelos econométricos</h2>
+<p>Un modelo econométrico describe la relación entre una o más variables explicativas, y una o más variables de respuesta. La visualización a través de gráficos puede ayudar a entender estas relaciones. Sin embargo, cubrir los detalles de ajustar modelos econométricos a través de <code>R</code> se encuentra por fuera de los objetivos de este <em>blog</em>. Aquí, en cambio, se discutirán algunas formas de extraer información valiosa, que es fácil de trabajarse a través de <code>ggplot2</code>. El objetivo, por tanto, es tomar objetos almacenados en nuestro entorno, y producir un gráfico apropiado.</p>
+<section id="gráficos-de-correlación" class="level3">
+<h3 class="anchored" data-anchor-id="gráficos-de-correlación">Gráficos de correlación</h3>
+<p>Un gráfico de correlación ayuda a visualizar la relación pareada entre un conjunto de variables cuantitativas, desplegando su fuerza de asociación a través de colores, o sombras.</p>
+<p>El siguiente ejemplo se construye con base en datos de [Gapminder], que se enfoca en estadísticas e información sobre desarrollo social, económico y medioambiental, tanto a nivel local, nacional, como global. Esta base de datos, particularmente, cuenta con información de todos los continentes a nivel mundial, entre 1952 y 2007.</p>
+<p>En el siguiente código:</p>
+<ol type="1">
+<li>La función <code>select_if</code> nos permitirá seleccionar solo las variables cuantitativas dentro de la base de datos.</li>
+<li>La función <code>cor</code> calcula las correlaciones.</li>
+</ol>
+<ul>
+<li>El uso de <code>use = "complete.obs"</code>, elimina todos los casos con valores perdidos.</li>
+</ul>
+<ol start="3" type="1">
+<li>La función <code>round</code> redondeará los resultados obtenidos a dos decimales.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> gapminder<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>gapminder</span>
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Seleccionamos variables numericas</span></span>
+<span id="cb1-4">df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> dplyr<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">select_if</span>(data, is.numeric)</span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculamos correlaciones</span></span>
+<span id="cb1-7">r <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cor</span>(df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">use =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"complete.obs"</span>)</span>
+<span id="cb1-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(r, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          year lifeExp   pop gdpPercap
+year      1.00    0.44  0.08      0.23
+lifeExp   0.44    1.00  0.06      0.58
+pop       0.08    0.06  1.00     -0.03
+gdpPercap 0.23    0.58 -0.03      1.00</code></pre>
+</div>
+</div>
+<p>Ahora, para visualizar las correlaciones, la función <code>ggcorrplot()</code> de la paquetería <code>ggcorrplot</code> será utlizada. Por <em>default</em>, la función crea una gráfica de <code>ggplot</code>, donde el rojo más oscuro indicará correlaciones fuertes positivas, el azul más oscuro indicará correlaciones negativas fuertes, y el color blanco indicará no correlación:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggcorrplot)</span>
+<span id="cb3-2"></span>
+<span id="cb3-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggcorrplot</span>(r)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/correlation-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La función <code>ggcorrplot()</code> cuenta con múltiples opciones de personalización. Sin embargo, más allá de repasar cada una de estas, es importante tener en mente que, un gráfico que muestre una matriz de correlación, debe contar por lo menos:</p>
+<ol type="1">
+<li><strong>Diseño visual claro</strong>:</li>
+</ol>
+<ul>
+<li>Colores informativos y graduales que representen magnitud y dirección de la correlación.</li>
+<li>Escala de color comprensible que incluya una barra de escala para mostrar cómo los colores corresponden a los valores del coeficiente de correlación.</li>
+</ul>
+<ol start="2" type="1">
+<li><strong>Presentación de datos relevantes</strong>:</li>
+</ol>
+<ul>
+<li>Hacer visibles los valores de correlación directamente en las celdas.</li>
+<li>Ordenar las variables de forma que se resalten patrones claros.</li>
+<li>Asegurar que el tamaño de las celdas sea adecuado para que los colores, y valores numéricos sean fáciles de interpretar.</li>
+</ul>
+<ol start="3" type="1">
+<li><strong>Foco en información importante</strong>:</li>
+</ol>
+<ul>
+<li>Filtrar correlaciones no significativas (por ejemplo, a través de <code>ggcorrplot(..., insig = "blank")</code>).</li>
+<li>Enfocar variables clave resaltando o agrupando aquellas más importnates para evitar sobrecargar el gráfico.</li>
+</ul>
+<ol start="4" type="1">
+<li><strong>Contexto y anotaciones</strong>:</li>
+</ol>
+<ul>
+<li>Incluir un título descriptivo, asegurándonos que los nombres de las variables sean comprensibles.</li>
+<li>Preferentemente, indicar niveles de significancia.</li>
+</ul>
+<ol start="5" type="1">
+<li><strong>Simplicidad y accesibilidad</strong>:</li>
+</ol>
+<ul>
+<li>Evitar saturación visual.</li>
+<li>Asegurar que el esquema de colores sea apto para personas con alguna discapacidad visual, utilizando paletas como <code>viridis</code>.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggcorrplot</span>(r,</span>
+<span id="cb4-2">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hc.order =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Reordenamiento segun corr. similar</span></span>
+<span id="cb4-3">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lower"</span>,         <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Triangulo inferior de la matriz</span></span>
+<span id="cb4-4">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lab =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,             <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Mostrar valores numericos</span></span>
+<span id="cb4-5">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lab_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>,           <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Tamaño de los valores</span></span>
+<span id="cb4-6">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colors =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"firebrick2"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"white"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodgerblue"</span>),  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Paleta de colores</span></span>
+<span id="cb4-7">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Matriz de correlación: SaratogaHouses"</span>,</span>
+<span id="cb4-8">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ggtheme =</span> jtools<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>())</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/correlation-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="modelos-de-regresión-lineal" class="level2">
+<h2 class="anchored" data-anchor-id="modelos-de-regresión-lineal">Modelos de regresión lineal</h2>
+<p>Los modelos de regresión lineal permiten explorar la relación entre una variable de respuesta cuantitativa, y una variable explicativa, mientras otras medidas permanecen constantes.</p>
+<p>En este ejemplo, utilizamos una regresión lineal múltiple por Mínimos Cuadrados Ordinarios (MCO), utilizando la base de datos <code>gapminder</code>. Debido a que esta base tiene una estructura tipo panel (país-año), la especificación empleada vuelve la estimación incorrecta. Sin embargo, por ahora no nos fijaremos en este punto.</p>
+<p>Para la estimación, utilizamos la función <code>lm()</code>, cuyo resultado se guardará en un objeto de nombre <code>out</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Construimos el modelo de regresion lineal multiple</span></span>
+<span id="cb5-2">out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(lifeExp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> gdpPercap <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> pop <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> continent,</span>
+<span id="cb5-3">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> data)</span>
+<span id="cb5-4"></span>
+<span id="cb5-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualizamos un resumen de resultados</span></span>
+<span id="cb5-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(out)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = lifeExp ~ gdpPercap + pop + continent, data = data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-49.161  -4.486   0.297   5.110  25.175 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       4.781e+01  3.395e-01 140.819  &lt; 2e-16 ***
+gdpPercap         4.495e-04  2.346e-05  19.158  &lt; 2e-16 ***
+pop               6.570e-09  1.975e-09   3.326 0.000901 ***
+continentAmericas 1.348e+01  6.000e-01  22.458  &lt; 2e-16 ***
+continentAsia     8.193e+00  5.712e-01  14.342  &lt; 2e-16 ***
+continentEurope   1.747e+01  6.246e-01  27.973  &lt; 2e-16 ***
+continentOceania  1.808e+01  1.782e+00  10.146  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 8.365 on 1697 degrees of freedom
+Multiple R-squared:  0.5821,    Adjusted R-squared:  0.5806 
+F-statistic: 393.9 on 6 and 1697 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>El resultado observado con la función <code>summary()</code> nos da una idea precisa del modelo, aunque no podemos hacer mucho más análisis directo. Por ejemplo, ¿qué pasaría si quisiéramos visualizar algo desde este modelo? La información necesaria para generar un gráfico se encuentra dentro del objeto, aunque esta no es obvia a simple vista.</p>
+<section id="tres-recomendaciones-básicas" class="level3">
+<h3 class="anchored" data-anchor-id="tres-recomendaciones-básicas">Tres recomendaciones básicas</h3>
+<p>Toda figura que se construye con base en modelos econométricos se enfrentan a retos de visualización. En ciencias sociales, la habilidad de crear y presentar con honestidad gráficos basados en modelos, ha avanzado significativamente en los últimos años. Sin embargo, al tiempo en que se ha progresado en formas de visualización, también han crecido los retos inherentes a estas tareas debido a la complejidad de los modelos econométricos.</p>
+<ol type="1">
+<li><strong>Presentar los hallazgos en términos sustantivos</strong> Todo gráfico basado en modelos econométricos debe mostrar resultados en formas que son sustancialmente significativos, y directamente interpretables con respecto a las preguntas que el análisis intenta resolver. Por tanto, también es recomendable…</li>
+<li><strong>Presentar los grados de confianza en los gráficos</strong> Los modelos vienen con diversas medidas de precisión, confianza, o significancia. Presentar e interpretar estas medidas puede llevar a malas interpretaciones, e incluso sobre-representaciones. Sin embargo, es necesario ser honestos y claros en lo presentado.</li>
+<li>** Mostrar los datos… siempre que se pueda** Por lo general, presentar resultados de un modelo de regresión lineal múltiple (como en este ejemplo práctico), generalmente significa dos cosas:</li>
+</ol>
+<ul>
+<li>Mostrar el efecto en una tabla con coeficientes asociados a medidas de confianza.</li>
+<li>Mostrar los valores pronosticados de algunas variables dentro de un rango de interés.
+<ul>
+<li>Esto nos permite mostrar datos originales en puntos.</li>
+</ul></li>
+</ul>
+</section>
+<section id="pronósticos" class="level3">
+<h3 class="anchored" data-anchor-id="pronósticos">Pronósticos</h3>
+<p>Ajustado el modelo ahora podemos darnos una idea visual de las estimaciones que produce sobre un rango de variables particulares, manteniendo constantes otros covariantes, en algunos valores sensibles. Para esto seguiremos la función: <code>predict()</code>. ¿Pero qué haremos?</p>
+<p>Primero, generaremos una nueva base de datos cuyas columnas tendrán los mismos nombres que las variables en los datos del modelo original, pero ahora sus filas tendrán nuevos valores. Para esto utilizaremos la función <code>expand.grid()</code>. Sin embargo, antes de ello, utilizaremos las funciones <code>min()</code> y <code>max()</code> para obtener los valores mínimos y máximos de <code>gdpPercap</code>, y luego generaremos un vector con 100 elementos entre estos valores. Finalmente, mantendremos la población constante a su mediana, y dejaremos que la variable <code>continent</code> tome sus cinco valores originales posibles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">min_gdp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">min</span>(data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>gdpPercap)</span>
+<span id="cb7-2">max_gdp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">max</span>(data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>gdpPercap)</span>
+<span id="cb7-3">med_pop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pop)</span>
+<span id="cb7-4"></span>
+<span id="cb7-5">pred_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expand.grid</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">gdpPercap =</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> min_gdp, </span>
+<span id="cb7-6">                                        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> max_gdp,</span>
+<span id="cb7-7">                                        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">length.out =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)), </span>
+<span id="cb7-8">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pop =</span> med_pop, </span>
+<span id="cb7-9">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">continent =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Africa"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Americas"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Asia"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span>,</span>
+<span id="cb7-10">                                     <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Oceania"</span>))</span>
+<span id="cb7-11"></span>
+<span id="cb7-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dim</span>(pred_df)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 500   3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">pred_out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">object =</span> out, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> pred_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">interval =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"predict"</span>)</span>
+<span id="cb9-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(pred_out)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       fit      lwr      upr
+1 47.96863 31.54775 64.38951
+2 48.48298 32.06231 64.90365
+3 48.99733 32.57670 65.41797
+4 49.51169 33.09092 65.93245
+5 50.02604 33.60497 66.44711
+6 50.54039 34.11885 66.96193</code></pre>
+</div>
+</div>
+<p>Como sabemos que, por construcción, los casos en <code>pred_df</code>, y <code>pred_out</code> corresponden a filas por filas, podemos juntar las dos bases de datos por columna.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">pred_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind</span>(pred_df, pred_out)</span>
+<span id="cb11-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(pred_df)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  gdpPercap     pop continent      fit      lwr      upr
+1  241.1659 7023596    Africa 47.96863 31.54775 64.38951
+2 1385.4282 7023596    Africa 48.48298 32.06231 64.90365
+3 2529.6905 7023596    Africa 48.99733 32.57670 65.41797
+4 3673.9528 7023596    Africa 49.51169 33.09092 65.93245
+5 4818.2150 7023596    Africa 50.02604 33.60497 66.44711
+6 5962.4773 7023596    Africa 50.54039 34.11885 66.96193</code></pre>
+</div>
+</div>
+<p>Ahora sí… El resultado es una base de datos que contiene valores pronosticados del modelo ajustado, para un rango de valores que nosotros especificamos. Con base en esto podemos visualizar los resultados. Debido a que el producto fue para un rango de valores pronosticados de interés, podemos decidir si utilziar todos, o una parte de estos. Por tanto, fijémonos únicamente en el caso de Europa y América.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">subset</span>(pred_df,</span>
+<span id="cb13-2">                          continent <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Americas"</span>)),</span>
+<span id="cb13-3">            <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb13-4">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> fit,</span>
+<span id="cb13-5">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> lwr, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> upr,</span>
+<span id="cb13-6">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> continent,</span>
+<span id="cb13-7">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> continent,</span>
+<span id="cb13-8">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">group =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">subset</span>(data,</span>
+<span id="cb13-10">                             continent <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Americas"</span>)),</span>
+<span id="cb13-11">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb13-12">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> continent),</span>
+<span id="cb13-13">               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>,</span>
+<span id="cb13-14">               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">inherit.aes =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_ribbon</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Pronóstico por MCO"</span>,</span>
+<span id="cb13-18">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europa y América a distintos niveles de PIB per cápita"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita (log)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Estimación"</span>,</span>
+<span id="cb13-20">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-21">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_log10</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">labels =</span> scales<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>dollar) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-22">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-23">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/predict-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="estimaciones-a-nivel-componente" class="level3">
+<h3 class="anchored" data-anchor-id="estimaciones-a-nivel-componente">Estimaciones a nivel componente</h3>
+<p>El gráfico anterior nos da una idea de los valores pronosticados de expectativa de vida, frente a diferentes niveles de PIB per cápita (en escala logarítmica), tanto para países del continente europeo, como americano. A continuación, lo que haremos será graficar el coeficiente estimado de cada covariante de nuestro modelo, como un punto en un plano donde el eje <img src="https://latex.codecogs.com/png.latex?X">, será la estimación, y el eje <img src="https://latex.codecogs.com/png.latex?Y"> corresponderá a cada covariante.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">out_comp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tidy</span>(out)</span>
+<span id="cb14-2">out_comp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb14-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round_df</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 5
+  term              estimate std.error statistic p.value
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)          47.8      0.34     141.     0    
+2 gdpPercap             0        0         19.2    0    
+3 pop                   0        0          3.33   0.001
+4 continentAmericas    13.5      0.6       22.5    0    
+5 continentAsia         8.19     0.571     14.3    0    
+6 continentEurope      17.5      0.625     28.0    0    
+7 continentOceania     18.1      1.78      10.1    0    </code></pre>
+</div>
+</div>
+<p>En este código, lo que hicimos fue tomar el objeto que contiene la estimación del modelo (<code>out</code>), y convertimos los resultados en una base de datos con información a nivel de los covariantes (función <code>tidy()</code>). Finalmente, la segunda parte del código, lo único que hizo fue redondear los decimales a dos posiciones (función <code>round_df</code>).</p>
+<p>Ahora sí…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">out_comp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb16-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> term,</span>
+<span id="cb16-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> estimate)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove.y.gridlines =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>,</span>
+<span id="cb16-7">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove.x.gridlines =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/coefficients-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Sin embargo, siguiendo nuestras recomendaciones, es importante poder pensar en agregar a estos puntos el intervalo de confianza. Para ello, utilicaremos el siguiente código:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">out_conf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tidy</span>(out,</span>
+<span id="cb17-2">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">conf.int =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb17-3">out_conf <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb17-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round_df</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 7
+  term              estimate std.error statistic p.value conf.low conf.high
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)          47.8      0.34     141.     0        47.1      48.5 
+2 gdpPercap             0        0         19.2    0         0         0   
+3 pop                   0        0          3.33   0.001     0         0   
+4 continentAmericas    13.5      0.6       22.5    0        12.3      14.7 
+5 continentAsia         8.19     0.571     14.3    0         7.07      9.31
+6 continentEurope      17.5      0.625     28.0    0        16.2      18.7 
+7 continentOceania     18.1      1.78      10.1    0        14.6      21.6 </code></pre>
+</div>
+</div>
+<p>Por conveniencia, el operador <code>%nin%</code> está disponible a través de la paquetería <code>socviz</code>, y realiza algo opuesto al operador <code>%in%</code>, seleccionando únicamente los términos en el primer vector de caracteres, que no se encuentran en el segundo. Este operador lo utilizaremos para dejar de lado el término del intercepto de la tabla generada.</p>
+<p>A continuación, nuestro gráfico evitará el intercepto, y manejará las etiquetas de los covariantes de una mejor forma, evitando casos como <code>continentAmericas</code>. Finalmente, <em>por fin</em> podremos ver las líneas que corresponderán al intervalo de confianza, y ordenaremos estas de mayor a menor:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(socviz)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'socviz'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:jtools':
+
+    %nin%</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dendroTools':
+
+    round_df</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">out_conf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">subset</span>(out_conf,</span>
+<span id="cb23-2">                   term <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%nin%</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(Intercept)"</span>)</span>
+<span id="cb23-3">out_conf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>nicelabs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">prefix_strip</span>(out_conf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>term, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"continent"</span>)</span>
+<span id="cb23-4"></span>
+<span id="cb23-5">out_conf <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb23-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder</span>(nicelabs, estimate),</span>
+<span id="cb23-7">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> estimate,</span>
+<span id="cb23-8">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> conf.low, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> conf.high)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb23-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_pointrange</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb23-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb23-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Efecto estimado sobre expectativa de vida"</span>,</span>
+<span id="cb23-12">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Coeficientes e intervalos de confianza"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb23-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Estimación MCO"</span>,</span>
+<span id="cb23-14">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb23-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove.x.gridlines =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>,</span>
+<span id="cb23-16">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove.y.gridlines =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb23-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/coefficients-plot4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="efectos-marginales" class="level2">
+<h2 class="anchored" data-anchor-id="efectos-marginales">Efectos marginales</h2>
+<p>Hasta ahora, lo que hemos elaborado son visualizaciones sobre estimaciones del efecto promedio de algun coeficiente, manteniendo constantes otros términos de nuestro modelo. Los gráficos de efectos marginales o parciales, en cambio, han obtenido mucha popularidad debido a su utilidad para presentar pronósticos precisos e interpretativos. Particularmente, el interés sobre estos gráficos incrementó gracias dificultades asociadas a la interpretación de términos de modelos de regresión logística, así como a modelos con especificaciones de covariantes en interacción. Para estos, utilizaremos la paquetería <code>margins</code>.</p>
+<p>Para ver cómo funcionan estos gráficos, utilicemos ahora la base de datos <code>gss_sm</code> (General Social Survey), y enfoquémonos en la variable binaria: <code>obama</code>. Esta variable tiene dos posibles valores. Cuando la variable es igual a <img src="https://latex.codecogs.com/png.latex?1">, el individuo encuestado indicó haber votado por el ex-presidente estadounidense Barack Obama en las elecciones de 2012; y es igual a <img src="https://latex.codecogs.com/png.latex?0"> en otros casos.</p>
+<p>Con base en esta información, ajustaremos un modelo de regresión logística sobre la variable <code>obama</code>, con <code>age</code>, <code>polviews</code>, <code>race</code>, y <code>sex</code>, como covariantes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1">gss_sm<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>polviews_m <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">relevel</span>(gss_sm<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>polviews, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ref =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Moderate"</span>)</span>
+<span id="cb24-2">out_bo <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glm</span>(obama <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> polviews_m <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> sex<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>race,</span>
+<span id="cb24-3">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"binomial"</span>,</span>
+<span id="cb24-4">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> gss_sm)</span>
+<span id="cb24-5"></span>
+<span id="cb24-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(out_bo)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = obama ~ polviews_m + sex * race, family = "binomial", 
+    data = gss_sm)
+
+Coefficients:
+                                  Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                       0.296493   0.134091   2.211  0.02703 *  
+polviews_mExtremely Liberal       2.372950   0.525045   4.520 6.20e-06 ***
+polviews_mLiberal                 2.600031   0.356666   7.290 3.10e-13 ***
+polviews_mSlightly Liberal        1.293172   0.248435   5.205 1.94e-07 ***
+polviews_mSlightly Conservative  -1.355277   0.181291  -7.476 7.68e-14 ***
+polviews_mConservative           -2.347463   0.200384 -11.715  &lt; 2e-16 ***
+polviews_mExtremely Conservative -2.727384   0.387210  -7.044 1.87e-12 ***
+sexFemale                         0.254866   0.145370   1.753  0.07956 .  
+raceBlack                         3.849526   0.501319   7.679 1.61e-14 ***
+raceOther                        -0.002143   0.435763  -0.005  0.99608    
+sexFemale:raceBlack              -0.197506   0.660066  -0.299  0.76477    
+sexFemale:raceOther               1.574829   0.587657   2.680  0.00737 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2247.9  on 1697  degrees of freedom
+Residual deviance: 1345.9  on 1686  degrees of freedom
+  (1169 observations deleted due to missingness)
+AIC: 1369.9
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+</div>
+<p>En función de lo anterior, podemos ahora graficar nuestros datos de diferentes formas. Con base en la función <code>margins()</code>, ahora calcularemos los efectos marginales de cada variable:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(margins)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'margins' was built under R version 4.3.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1">bo_m <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">margins</span>(out_bo)</span>
+<span id="cb28-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(out_bo)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = obama ~ polviews_m + sex * race, family = "binomial", 
+    data = gss_sm)
+
+Coefficients:
+                                  Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                       0.296493   0.134091   2.211  0.02703 *  
+polviews_mExtremely Liberal       2.372950   0.525045   4.520 6.20e-06 ***
+polviews_mLiberal                 2.600031   0.356666   7.290 3.10e-13 ***
+polviews_mSlightly Liberal        1.293172   0.248435   5.205 1.94e-07 ***
+polviews_mSlightly Conservative  -1.355277   0.181291  -7.476 7.68e-14 ***
+polviews_mConservative           -2.347463   0.200384 -11.715  &lt; 2e-16 ***
+polviews_mExtremely Conservative -2.727384   0.387210  -7.044 1.87e-12 ***
+sexFemale                         0.254866   0.145370   1.753  0.07956 .  
+raceBlack                         3.849526   0.501319   7.679 1.61e-14 ***
+raceOther                        -0.002143   0.435763  -0.005  0.99608    
+sexFemale:raceBlack              -0.197506   0.660066  -0.299  0.76477    
+sexFemale:raceOther               1.574829   0.587657   2.680  0.00737 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2247.9  on 1697  degrees of freedom
+Residual deviance: 1345.9  on 1686  degrees of freedom
+  (1169 observations deleted due to missingness)
+AIC: 1369.9
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1">bo_gg <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as_tibble</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(bo_m))</span>
+<span id="cb30-2">prefixes <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"polviews_m"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sex"</span>)</span>
+<span id="cb30-3">bo_gg<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>factor <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">prefix_strip</span>(bo_gg<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>factor, prefixes)</span>
+<span id="cb30-4">bo_gg<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>factor <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">prefix_replace</span>(bo_gg<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>factor, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"race"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Race: "</span>)</span>
+<span id="cb30-5"></span>
+<span id="cb30-6">bo_gg <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb30-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">select</span>(factor, AME, lower, upper)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 4
+  factor                     AME    lower   upper
+  &lt;chr&gt;                    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+1 Conservative           -0.412  -0.467   -0.356 
+2 Extremely Conservative -0.454  -0.536   -0.371 
+3 Extremely Liberal       0.268   0.210    0.326 
+4 Liberal                 0.277   0.232    0.322 
+5 Slightly Conservative  -0.266  -0.330   -0.201 
+6 Slightly Liberal        0.193   0.134    0.253 
+7 Race: Black             0.403   0.369    0.437 
+8 Race: Other             0.125   0.0490   0.200 
+9 Female                  0.0443  0.00967  0.0789</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Plot</span></span>
+<span id="cb32-2">bo_gg <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb32-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder</span>(factor, AME),</span>
+<span id="cb32-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> AME, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> lower, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> upper)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb32-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yintercept =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>,</span>
+<span id="cb32-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"gray80"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb32-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_pointrange</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb32-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb32-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Efectos Marginales Promedio"</span>,</span>
+<span id="cb32-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gss_sm"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb32-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove.y.gridlines =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>,</span>
+<span id="cb32-12">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove.x.gridlines =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb32-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/marginal-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>ggplot2</category>
+  <category>tidyverse</category>
+  <category>Econometrics</category>
+  <guid>https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/</guid>
+  <pubDate>Thu, 16 Jan 2025 06:00:00 GMT</pubDate>
+  <media:content url="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/banner.png" medium="image" type="image/png" height="80" width="144"/>
+</item>
+<item>
+  <title>Visualización de relaciones bivariadas</title>
+  <dc:creator>Pedro I. Rosas-Medina</dc:creator>
+  <link>https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>En las ciencias sociales, frecuentemente nos interesamos en interrogantes que implican explorar relaciones entre variables. Una forma usual y efectiva de entender la manera en que dos variables se relacionan, es a través de la visualización de gráficos. Sin embargo, la forma estética que estos adquieren, depende en la distinción e identificación de qué clase de variables se encuentran en nuestra relación de interés.</p>
+<p>Al examinar relaciones bivariadas entre dos variables categóricas, una aproximación común y efectiva es el uso de gráficos de barras apilados, agrupados, o segmentados. Con estos, el análisis permite comparar frecuencias o proporciones entre las categorías que conforman cada variable (por ejemplo, la frecuencia de mujeres u hombres dentro de una muestra; o el nivel educativo de las personas que la componen). Por otro lado, cuando las variables involucradas son de corte cuantitativo o numérico, los gráficos de dispersión -o <em>scatterplots</em>, son la opción más adecuada, pues facilitan visualizar correlaciones, o patrones de asociación entre las dos variables de interés, permitiendo identificar tendencias, relaciones lineales o no lineales, así como la presencia de posibles valores atípicos.</p>
+<p>A pesar de que los gráficos de dispersión suelen ser sencillos de interpretar, es muy usual encontrar ejemplos muy poco claros, con exceso de elementos visuales, desdén por el contexto de los propios datos, uso inadecuado de colores, o inconsistencias como la combinación de datos que no tienen una relación coherente o comparable.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En este blog ahondaré, paso por paso, cómo construir gráficos de dispersión adecuados utilizando <code>ggplot2</code>, una paquetería en <code>R</code> que forma parte del ecosistema <code>tidyverse</code> diseñada para crear visualizaciones de datos de forma flexible, intuitiva, y estéticamente atractiva. Para estos ejemplos, usaremos la base de datos de <strong>Gapminder Foundation</strong>, <code>gapminder</code>, que incluye estadísticas históricas sobre desarrollo humano a nivel global, y que es altamente utilizada para el análisis y visualización de información. Para ello, utilicemos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> gapminder<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>gapminder <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb1-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">gdpPercap =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log10</span>(gdpPercap))</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(gapminder)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  country     continent  year lifeExp      pop gdpPercap
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333      779.
+2 Afghanistan Asia       1957    30.3  9240934      821.
+3 Afghanistan Asia       1962    32.0 10267083      853.
+4 Afghanistan Asia       1967    34.0 11537966      836.
+5 Afghanistan Asia       1972    36.1 13079460      740.
+6 Afghanistan Asia       1977    38.4 14880372      786.</code></pre>
+</div>
+</div>
+<p>Como podemos ver, esta es una base de datos tipo panel, con seis variables: <code>country</code>, <code>continent</code>, <code>year</code>, <code>lifeExp</code>, <code>pop</code>, y <code>gdpPercap</code>. Para estos ejemplos, nos concentraremos en las variables <code>lifeExp</code>, y <code>gdpPercap</code>, que miden la expectativa de vida (en años), y el PIB per cápita de los países del mundo (en escala logarítmica), respectivamente.</p>
+<section id="gráficos-de-dispersión-simples" class="level2">
+<h2 class="anchored" data-anchor-id="gráficos-de-dispersión-simples">Gráficos de dispersión simples</h2>
+<p>Crear un gráfico de dispersión simple con <code>ggplot</code> requiere tres componentes:</p>
+<ol type="1">
+<li><code>data %&gt;%</code>: el marco de datos seguido del operador <code>%&gt;%</code>, o pipe, que <em>pasa</em> directamente la base de datos como entrada a <code>ggplot()</code>.</li>
+<li><code>ggplot()</code>: que inicia la construcción del gráfico. Dentro de los paréntesis definiremos la estética del gráfico a través de <code>aes()</code>, es decir, cómo se asignarán:</li>
+</ol>
+<ul>
+<li><code>x = gdpPercap</code>,</li>
+<li><code>y = lifeExp</code>,
+<ul>
+<li>Es decir, las variables en los ejes <code>X</code> y <code>Y</code>, respectivamente.</li>
+</ul></li>
+</ul>
+<ol start="3" type="1">
+<li><code>geom_point()</code>: que añadirá los puntos al gráfico, donde cada punto representará una observación (en este caso, un país-año). Sin esta función, únicamente podríamos observar un plano, sin ningún elemento estético dentro.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb3-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Sin embargo, este ejemplo nos permite ver algunos errores comunes. En primer lugar, es notorio el severo <em>overplotting</em> de los puntos, o el uso de etiquetas de ejes asignadas por <em>default</em> según el nombre de las variables graficadas. Además, la visualización carece de un título y/o subtítulo que explique el propósito del gráfico, y la información encontrada no dice mucho más.</p>
+<p>Ahora, veamos cómo cambia al momento de añadir algunas especificaciones adicionales al código inicial:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb4-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodgerblue"</span>,</span>
+<span id="cb4-5">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb4-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb4-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb4-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb4-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb4-14">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb4-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-17">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb4-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb4-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb4-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb4-22">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Este nuevo código añadió lo siguiente:</p>
+<ol type="1">
+<li>Ajuste del color</li>
+</ol>
+<ul>
+<li>Dentro de la función <code>geom_point()</code>, especificamos que el color de los puntos sería igual a <code>dodgerblue</code>, su tamaño sería de <code>1.5</code> puntos, y añadimos transparencia igual a <code>0.8</code>, con el objetivo de reducir manchas, y distinguir más observaciones.</li>
+</ul>
+<ol start="2" type="1">
+<li>Información descriptiva:</li>
+</ol>
+<ul>
+<li>A través de la función <code>ggtitle()</code> indicamos el título, y subtítulo, entre comillas, para nuestro gráfico.</li>
+<li>La función <code>labs()</code> permitió especificar las etiquetas de los ejes <code>X</code> y <code>Y</code>, de tal forma que ahora, estas sustituyen los nombres de las variables.
+<ul>
+<li>Adicionalmente, la especificación <code>caption =</code>, da la posibilidad de añadir texto adicional al pie del gráfico. Esto es muy útil al momento de colocar, por ejemplo, la fuente de la información, o una nota aclaratoria.</li>
+</ul></li>
+</ul>
+<ol start="3" type="1">
+<li>Selección de un tema:</li>
+</ol>
+<ul>
+<li>La función <code>theme_classic()</code> añadió una personalización de apariencia al gráfico.
+<ul>
+<li>Los temas en <code>ggplot2</code> sirven para controlar elementos como colores de fondo, tamaños, y estilos de texto, líneas, cuadrículas y posiciones de leyendas. Esto da la posibilidad de mejorar la estética, y adaptarla a contextos específicos, garantizando que el diseño sea claro y profesional.</li>
+</ul></li>
+</ul>
+<ol start="4" type="1">
+<li>Control adicional de elementos distintos a los datos:</li>
+</ol>
+<ul>
+<li>Mediante la función <code>theme()</code>, añadimos controles adicionales al título (<code>plot.title =</code>), subtítulo (<code>plot.subtitle =</code>), fuente (<code>plot.caption =</code>), etiquetas de ejes (<code>axis.title =</code>), y texto de los ejes (<code>axis.text =</code>) del gráfico.</li>
+</ul>
+</section>
+<section id="gráficos-de-dispersión-agrupados" class="level2">
+<h2 class="anchored" data-anchor-id="gráficos-de-dispersión-agrupados">Gráficos de dispersión agrupados</h2>
+<p>Estos gráficos pueden ser considerados oportunos y efectivos en algunos contextos. Sin embargo, en diferentes situaciones podríamos considerar añadir niveles adicionales de análisis y profundidad a través de gráficos de dispersión agupados, donde el verdadero asunto ya no es únicamente observar la relación entre una variable cuantitativa <em>A</em> y otra del mismo tipo <em>B</em>, sino contrastar ambas frente a una variable categórica. Los <em>scatterplots</em> agrupados tienen diferentes razones de ser:</p>
+<ol type="1">
+<li><strong>Comparación entre categorías</strong>: permiten observar diferencias o patrones específicos en subgrupos como el género, regiones geográficas, o categorías socioeconómicas.</li>
+<li><strong>Identificación de patrones ocultos</strong>: con estos es posible detectar tendencias o relaciones que un gráfico simple podría ocultar debido a la agregación.</li>
+<li><strong>Mayor riqueza interpretativa</strong>: incluir agrupaciones mejora el contexto y facilita conclusiones más detalladas.</li>
+<li><strong>Facilidad para resaltar diferencias</strong>: permiten identificar visualmente subgrupos que se desvían del patrón general, algo clave para detectar sesgos, excepciones o grupos destacados.</li>
+<li><strong>Comunicación clara</strong>: en análisis y presentaciones, es más intuitivo y efectivo mostrar cómo se comportan los datos dentro de categorías relevantes, en lugar de asumir que un solo gráfico puede explicarlo todo.</li>
+</ol>
+<section id="agrupación-por-color" class="level3">
+<h3 class="anchored" data-anchor-id="agrupación-por-color">Agrupación por color</h3>
+<p>Una forma sencilla y eficaz de visualizar el agrupamiento de datos por categorías, es a través de la especificación de colores. En nuestro ejemplo, cada uno de los países se agrupa según el continente de ubicación. En este sentido, podría ser de interés visualizar de forma clara, cada uno de los puntos del gráfico según esta categoría de agrupamiento.</p>
+<p><code>ggplot</code> nos brinda esta oportunidad. Para ello, lo que realizamos es muy intuitivo: retomar nuestro código generado, y dentro de la función <code>aes()</code>, dentro también de <code>ggplot()</code>, especificamos que el color de los puntos en el gráfico, deberá asignarse según la variable <code>continent</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb5-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb5-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb5-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb5-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb5-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb5-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb5-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb5-14">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb5-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-17">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb5-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb5-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb5-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb5-22">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Por <em>default</em>, <code>ggplot</code> utiliza una paleta de colores basados en la función <code>scale_colour_brewer()</code>, con la paleta <code>"Set1"</code>, que es parte de la familia <code>RColorBrewer</code>. Esta paleta se diseña para asegurar que los colores sean fácilmente distinguibles entre sí.</p>
+<p>¿Pero puedo especificar mis propios colores? ¡Claro! Sin embargo, antes de ello, es importante considerar:</p>
+<ol type="1">
+<li><strong>Contraste adecuado</strong>: es importante asegurar que los colores sean lo suficientemente distintos para diferenciar categorías y evitar combinaciones problemáticas para personas con alguna discapacidad visual.</li>
+<li><strong>Consistencia y simplicidad</strong>: se recomienda usar paletas limitadas y coherentes en varios gráficos para evitar sobrecargar la visualización y facilitar la comparación.</li>
+<li><strong>Accesibilidad y legibilidad</strong>: es crucial verificar que los colores no dificulten la lectura de etiquetas o textos, y tengan un buen contraste de fondo.</li>
+<li><strong>Objetivo del gráfico</strong>: elige colores que resalten categorías de interés o sigan el objetivo de la visualización (comparación, descubrimiento, etc.).</li>
+<li><strong>Número de categorías</strong>: si hay muchas categorías, considera otras formas de distinción como facetas o diferentes formas, además de colores.</li>
+</ol>
+<p>Dicho esto, podemos cambiar o personalizar qué colores se asignan a cada continente, utilizando la función <code>scale_color_manual()</code> para establecer los colores en cada nivel de la variable <code>continent</code>. Por ejemplo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb6-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb6-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb6-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_color_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Africa"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, </span>
+<span id="cb6-8">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Asia"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"blue"</span>, </span>
+<span id="cb6-9">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"green"</span>, </span>
+<span id="cb6-10">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Oceania"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"purple"</span>, </span>
+<span id="cb6-11">                                <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Americas"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"orange"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb6-13">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb6-15">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb6-16">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb6-19">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb6-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-22">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb6-23">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb6-24">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-25">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb6-26">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb6-27">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="agrupación-por-forma" class="level3">
+<h3 class="anchored" data-anchor-id="agrupación-por-forma">Agrupación por forma</h3>
+<p>En algunos otros contextos, puede ser útil emplear una visualización agrupada donde cada categoría se visualice y diferencie en función de la forma de los puntos, y no el color. A pesar de que la lógica es muy similar a la anterior, en estos casos la elección suele radicar en formas de ayuda para evitar la dependencia del color, o simplificación del diseño gráfico (por ejemplo, para publicaciones donde se pide utilizar escalas de color gris).</p>
+<p>¿Cómo hacemos esto en <code>R</code> y a través de <code>ggplot</code>?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb7-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb7-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">shape =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb7-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb7-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb7-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb7-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb7-14">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb7-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-17">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb7-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb7-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-20">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb7-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb7-22">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>El ejemplo, no obstante, hace visible uno de los problemas con este caso. A pesar de que podemos ver algunas formas, como puntos redondos, triángulos, cuadrados, cruces, etc., es evidente que la cantidad de puntos con los que contamos es tal que se vuelve prácticamente inviable distinguir agrupaciones.</p>
+<p>Ahora vamos con las facetas o paneles. Cada grupo va a un panel distinto. Esto permite una comparación más adecuada cuando tenemos un gran <em>overlapping</em> de puntos.</p>
+</section>
+<section id="superposición-de-puntos-y-grupos-paneles" class="level3">
+<h3 class="anchored" data-anchor-id="superposición-de-puntos-y-grupos-paneles">¿Superposición de puntos y grupos? ¡Paneles!</h3>
+<p>En diferentes contextos la distinción de grupos no es suficiente o efectiva bajo la asignación de colores o formas a los puntos. En estos escenarios puede ser frustrante <em>jugar</em> con la transparencia, colores, o formas. ¿Qué hacemos entonces?</p>
+<p>Una solución a esto puede ser la generación de paneles, dividiendo la visualización en subgráficos, lo cual facilita la legibilidad sin sobrecargar un único gráfico. ¿Pero cómo le hacemos? En <code>ggplot</code> esto puede realizarse con la función <code>facet_wrap()</code>, o <code>facet_grid()</code>, aunque esta última no la tocaremos en este blog.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap,</span>
+<span id="cb8-3">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp,</span>
+<span id="cb8-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb8-6">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> continent) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb8-9">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>,</span>
+<span id="cb8-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>,</span>
+<span id="cb8-12">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>,</span>
+<span id="cb8-15">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-16">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb8-17">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-18">                                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb8-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb8-20">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-21">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb8-22">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>,</span>
+<span id="cb8-23">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-panels1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Cuando se desea generar un gráfico de dispersión agrupado por una variable (<code>continent</code> para este caso), el uso de <code>facet_wrap()</code> es efectivo. Nuestro ejemplo generó cinco paneles, uno para cada continente dentro de la muestra. Pero, ¿qué es importante considerar antes de generar esta solución?</p>
+<ul>
+<li><strong>Número de paneles</strong>: si tenemos demasiados grupos, el gráfico se vuelve difícil de leer. En este caso, es importante considerar la cantidad de categorías, o hacer una muestra representativa de los datos.</li>
+<li><strong>Etiquetas y títulos</strong>: es importante asegurar que cada panel esté adecuadamente etiquetado, para que sea fácil para el lector, identificar a qué grupo corresponde cada uno.</li>
+</ul>
+</section>
+<section id="extra-extra-gghighlight" class="level3">
+<h3 class="anchored" data-anchor-id="extra-extra-gghighlight">¡Extra, extra! <code>gghighlight()</code></h3>
+<p><code>gghighlight</code> es una herramienta muy valiosa para mejorar la accesibilidad, claridad y efectividad de los gráficos. Esta paquetería, ayuda a simplificar la visualización de datos complejos y permite resaltar patrones o subgrupos de interés de forma clara y atractiva, lo que facilita a los lectores comprender rápidamente la información que se desea transmitir.</p>
+<p>¿Pero qué resaltamos? Siguiendo los ejemplos hasta aquí generados, un posible primer uso de la función <code>gghighlight()</code> podría ser para resaltar, específicamente, los puntos (países) que correspondan al continente europeo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Instalar el paquete gghighlight si no lo tienes</span></span>
+<span id="cb9-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># install.packages("gghighlight")</span></span>
+<span id="cb9-3"></span>
+<span id="cb9-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(gghighlight)</span>
+<span id="cb9-5"></span>
+<span id="cb9-6">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb9-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodgerblue"</span>,</span>
+<span id="cb9-9">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb9-10">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gghighlight</span>(continent <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Europe"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb9-13">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>, </span>
+<span id="cb9-15">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>, </span>
+<span id="cb9-16">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb9-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb9-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb9-20">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb9-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb9-22">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Pero, ¿por qué no contar con lo mejor de ambos mundos? Es decir, ¿podríamos combinar <code>gghighlight()</code> y <code>facet_wrap()</code>? ¡Claro que sí! ¿Cómo?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> gdpPercap, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> lifeExp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>,</span>
+<span id="cb10-4">             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gghighlight</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vars</span>(continent)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Visualización de relaciones bivariadas"</span>,</span>
+<span id="cb10-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita vs. Expectativa de vida"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"PIB per cápita"</span>, </span>
+<span id="cb10-10">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expectativa de vida"</span>, </span>
+<span id="cb10-11">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuente: elaboración propia con base en datos de gapminder."</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_apa</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend.pos =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">face =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb10-14">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>),</span>
+<span id="cb10-15">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.caption =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hjust =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>),</span>
+<span id="cb10-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.title =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>),</span>
+<span id="cb10-17">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Veamos que, en este caso, contamos con la misma cantidad de paneles que en nuestro ejemplo sobre <code>facet_wrap()</code>, pero ahora, en cada uno de estos no únicamente extraemos los puntos que coinciden con la categoría particular; sino que además, también vemos todos los puntos contenidos en el gráfico conjunto, resaltando simplemente aquellos que <em>caen</em> en cada grupo.</p>
+</section>
+</section>
+<section id="recapitulando" class="level2">
+<h2 class="anchored" data-anchor-id="recapitulando">Recapitulando…</h2>
+<p>La visualización de relaciones bivariadas a través de gráficos de dispersión es una herramienta poderosa para explorar y entender datos, pero su efectividad depende en gran medida de cómo se presenten y ajusten los elementos visuales. En este post, hemos recorrido cómo un gráfico de dispersión simple puede convertirse en una visualización clara y significativa, mediante la adición de elementos como colores, tamaños y etiquetas bien pensadas. El uso de <code>ggplot2</code> en <code>R</code> permite no solo hacer estos ajustes de forma sencilla, sino también ofrecer un control total sobre los detalles del gráfico, lo cual es crucial para asegurar que la historia que queremos contar con nuestros datos se entienda con claridad. Así, la próxima vez que enfrentes un conjunto de datos con relaciones bivariadas, recuerda que un buen gráfico no solo debe ser atractivo, sino también informativo y contextualizado. ¡La clave está en los detalles!</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>ggplot2</category>
+  <category>tidyverse</category>
+  <guid>https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</guid>
+  <pubDate>Wed, 15 Jan 2025 06:00:00 GMT</pubDate>
+  <media:content url="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/banner.png" medium="image" type="image/png" height="96" width="144"/>
+</item>
+</channel>
+</rss>

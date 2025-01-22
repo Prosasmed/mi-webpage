@@ -75,7 +75,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-915cd6c369adc0a3a5f20144805f6d87.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7e390e59f2f0536363df4ffd3d3c2926.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/iconify-2.1.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -137,13 +141,17 @@ window.Quarto = {
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Efectos marginales condicionales – Pedro I. Rosas-Medina">
 <meta property="og:description" content="Análisis de efectos fijos de dos vías, y construcción de gráficos de efectos marginales para estimaciones con covariantes en interacción.">
-<meta property="og:image" content="banner.png">
+<meta property="og:image" content="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/banner.png">
 <meta property="og:site_name" content="Pedro I. Rosas-Medina">
 <meta property="og:locale" content="es_MX">
+<meta property="og:image:height" content="725">
+<meta property="og:image:width" content="1300">
 <meta name="twitter:title" content="Efectos marginales condicionales – Pedro I. Rosas-Medina">
 <meta name="twitter:description" content="Análisis de efectos fijos de dos vías, y construcción de gráficos de efectos marginales para estimaciones con covariantes en interacción.">
-<meta name="twitter:image" content="banner.png">
+<meta name="twitter:image" content="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/banner.png">
 <meta name="twitter:creator" content="@Pedro0909">
+<meta name="twitter:image-height" content="725">
+<meta name="twitter:image-width" content="1300">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -247,7 +255,7 @@ window.Quarto = {
   <li><a href="#gráficos-de-efectos-marginales-condicionales" id="toc-gráficos-de-efectos-marginales-condicionales" class="nav-link" data-scroll-target="#gráficos-de-efectos-marginales-condicionales">Gráficos de efectos marginales condicionales</a></li>
   </ul></li>
   </ul>
-</nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/Prosasmed/mi-webpage.git/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -466,7 +474,7 @@ Y_{it} = \beta_0 + \beta_1 X_{it} + \beta_2 Z_t + \beta_3 (X_{it} \times Z_{it})
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/marginal-plot3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -499,7 +507,7 @@ Z_{it} &amp;= -\frac{\beta_{1} X_{it}}{\beta_{3} Z_{it}},\\
 </section>
 </section>
 
-</main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -590,7 +598,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/prosasmed\.github\.io\/mi-webpage\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -604,6 +612,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
@@ -921,16 +934,48 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Pedro I. Rosas-Medina. Este sitio fue creado a través de Quarto Websites.</p>
+<p>Powered by <a href="https://quarto.org"><iconify-icon role="img" inline="" icon="simple-icons:quarto" aria-label="Icon quarto from simple-icons Iconify.design set." title="Icon quarto from simple-icons Iconify.design set."></iconify-icon> Quarto</a>.</p>
 </div>   
     <div class="nav-footer-center">
-      &nbsp;
-    </div>
+<p>Pedro I. Rosas-Medina</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/Prosasmed/mi-webpage.git/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
-      &nbsp;
-    </div>
+<p>Repo <a href="https://github.com/Prosasmed/mi-webpage.git"><iconify-icon role="img" inline="" icon="simple-icons:github" aria-label="Icon github from simple-icons Iconify.design set." title="Icon github from simple-icons Iconify.design set."></iconify-icon> GitHub</a>.</p>
+</div>
   </div>
 </footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
