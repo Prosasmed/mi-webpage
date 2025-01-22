@@ -6,15 +6,15 @@
       version="2.0">
 <channel>
 <title>Pedro I. Rosas-Medina</title>
-<link>https://Prosasmed.github.io/mi-webpage/blog.html</link>
-<atom:link href="https://Prosasmed.github.io/mi-webpage/blog.xml" rel="self" type="application/rss+xml"/>
+<link>https://prosasmed.github.io/mi-webpage/blog.html</link>
+<atom:link href="https://prosasmed.github.io/mi-webpage/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Análisis de Datos y Ciencia Política</description>
 <generator>quarto-1.6.40</generator>
 <lastBuildDate>Mon, 20 Jan 2025 00:00:00 GMT</lastBuildDate>
 <item>
   <title>Efectos marginales condicionales</title>
   <dc:creator>Pedro I. Rosas-Medina</dc:creator>
-  <link>https://Prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/</link>
+  <link>https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/</link>
   <description><![CDATA[ 
 
 
@@ -465,7 +465,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/marginal-plot3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/index_files/figure-html/marginal-plot3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -491,19 +491,19 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 </section>
 </section>
 
- ]]></description>
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a> ]]></description>
   <category>R</category>
   <category>Econometrics</category>
   <category>tidyverse</category>
   <category>ggplot2</category>
-  <guid>https://Prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/</guid>
+  <guid>https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/</guid>
   <pubDate>Mon, 20 Jan 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://Prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/banner.png" medium="image" type="image/png" height="80" width="144"/>
+  <media:content url="https://prosasmed.github.io/mi-webpage/posts/2025_ThirdBlogPost/banner.png" medium="image" type="image/png" height="80" width="144"/>
 </item>
 <item>
   <title>Trabajo visual en modelos econométricos</title>
   <dc:creator>Pedro I. Rosas-Medina</dc:creator>
-  <link>https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/</link>
+  <link>https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/</link>
   <description><![CDATA[ 
 
 
@@ -516,7 +516,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/bestfit-regressions1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/bestfit-regressions1-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/bestfit-regressions1-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -594,7 +594,7 @@ font-style: inherit;">ggcorrplot</span>(r)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/correlation-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/correlation-plot2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/correlation-plot2-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -696,7 +696,7 @@ font-style: inherit;">theme_apa</span>())</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/correlation-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/correlation-plot3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/correlation-plot3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1054,7 +1054,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/predict-plot3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/predict-plot3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/predict-plot3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1131,7 +1131,7 @@ font-style: inherit;">FALSE</span>)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/coefficients-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/coefficients-plot2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/coefficients-plot2-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1299,7 +1299,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/coefficients-plot4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/coefficients-plot4-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/coefficients-plot4-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1582,7 +1582,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/marginal-plot2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/marginal-plot2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/index_files/figure-html/marginal-plot2-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1591,19 +1591,19 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 
 </section>
 
- ]]></description>
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a> ]]></description>
   <category>R</category>
   <category>ggplot2</category>
   <category>tidyverse</category>
   <category>Econometrics</category>
-  <guid>https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/</guid>
+  <guid>https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/</guid>
   <pubDate>Thu, 16 Jan 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://Prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/banner.png" medium="image" type="image/png" height="80" width="144"/>
+  <media:content url="https://prosasmed.github.io/mi-webpage/posts/2025_SecondBlogPost/banner.png" medium="image" type="image/png" height="80" width="144"/>
 </item>
 <item>
   <title>Visualización de relaciones bivariadas</title>
   <dc:creator>Pedro I. Rosas-Medina</dc:creator>
-  <link>https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</link>
+  <link>https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</link>
   <description><![CDATA[ 
 
 
@@ -1617,7 +1617,7 @@ font-style: inherit;">0</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/unnamed-chunk-2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1694,7 +1694,7 @@ font-style: inherit;">geom_point</span>()</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/scatterplot-simple1-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple1-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1847,7 +1847,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/scatterplot-simple2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-simple2-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2047,7 +2047,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/scatterplot-grouped1-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped1-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2253,7 +2253,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/scatterplot-grouped3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2411,7 +2411,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/scatterplot-grouped2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-grouped2-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2578,7 +2578,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-panels1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/scatterplot-panels1-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/scatterplot-panels1-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2757,7 +2757,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/unnamed-chunk-3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2916,7 +2916,7 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><a href="index_files/figure-html/unnamed-chunk-4-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -2931,13 +2931,13 @@ font-style: inherit;">8</span>))</span></code></pre></div>
 
 </section>
 
- ]]></description>
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a> ]]></description>
   <category>R</category>
   <category>ggplot2</category>
   <category>tidyverse</category>
-  <guid>https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</guid>
+  <guid>https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/</guid>
   <pubDate>Wed, 15 Jan 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://Prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/banner.png" medium="image" type="image/png" height="96" width="144"/>
+  <media:content url="https://prosasmed.github.io/mi-webpage/posts/2025_FirstBlogPost/banner.png" medium="image" type="image/png" height="96" width="144"/>
 </item>
 </channel>
 </rss>

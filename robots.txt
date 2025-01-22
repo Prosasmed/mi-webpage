@@ -1,1 +1,1 @@
-Sitemap: https://Prosasmed.github.io/mi-webpage/sitemap.xml
+Sitemap: https://prosasmed.github.io/mi-webpage/sitemap.xml
