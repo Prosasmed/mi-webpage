@@ -28,11 +28,18 @@
     "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
   },
   {
-    "objectID": "index.html#bio",
-    "href": "index.html#bio",
+    "objectID": "index.html#educación",
+    "href": "index.html#educación",
     "title": "Pedro I. Rosas-Medina",
-    "section": "",
-    "text": "Soy candidato a Doctor en Ciencias Sociales, con mención en Ciencia Política por la FLACSO México. Mis actividades académicas y profesionales se dividen principalmente en modelar y analizar cuantitativamente (el financiamiento público de la educación en países en vías de desarrollo, y la inversión privada en capital humano y los sesgos de género en la distribución del gasto de los hogares; así como en la gestión, análisis y visualización de datos cuantitativos (empleando lenguaje R, tidyverse, o ggplot2 y herramientas para reporte o difusión como Quarto, Shiny Apps, y Jupyter Notebooks.\nPor formación, mi investigación se sitúa en la intersección entre la economía política comparada, las políticas públicas, y la educación (especializándome en políticas de financiamiento educativo, dinámicas de inversión privada, política de partidos políticos, globalización y sindicalismo).Profesionalmente he trabajado como analista de datos, gestor de proyectos de evaluación en políticas públicas, y profesor en programación estadística para las ciencias sociales.\nEn este sitio comparto fundamentalmente mis proyectos de investigación, conferencias, proyectos de enseñanza, y mi CV, así como un blog técnico donde comparto RCode."
+    "section": "Educación",
+    "text": "Educación\n\nPh.D. Candidate Social Sciences (Especialización en Ciencia Política), 2025\nFLACSO, México\nMaestro en Gobierno y Asuntos Públicos, 2022\nFLACSO, México\nLicenciado en Políticas Públicas, 2018\nUAM, México"
+  },
+  {
+    "objectID": "index.html#intereses",
+    "href": "index.html#intereses",
+    "title": "Pedro I. Rosas-Medina",
+    "section": "Intereses",
+    "text": "Intereses\n\nCiencia Política\nEconometría\nAnálisis cuantitativo\nAnálisis de datos\nVisualización de datos\nPanel data\nR code\nQuarto"
   },
   {
     "objectID": "posts/2025_ThirdBlogPost/index.html",
